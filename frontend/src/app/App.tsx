@@ -1,4 +1,4 @@
-import { Database, Heart, LayoutGrid, Moon, Swords } from 'lucide-react';
+import { Database, Heart, LayoutGrid, Moon, Swords, Trophy } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { CompareView } from '../features/compare/CompareView';
 import { FavoritesView } from '../features/favorites/FavoritesView';
@@ -6,13 +6,15 @@ import { pokemonApi } from '../features/pokemon/api/pokemonApi';
 import { PokemonDetailDrawer } from '../features/pokemon/components/PokemonDetailDrawer';
 import { PokedexPage } from '../features/pokemon/pages/PokedexPage';
 import type { PokemonDetail, PokemonSummary } from '../features/pokemon/types/pokemon';
+import { TrunfoPage } from '../features/trunfo/pages/TrunfoPage';
+import type { TrunfoSetup } from '../features/trunfo/types/trunfo';
 import { useDebounce } from '../shared/hooks/useDebounce';
 import { ptBR } from '../shared/i18n/ptBR';
 import { useLocalStorage } from '../shared/hooks/useLocalStorage';
 import '../styles/global.css';
 
 const PAGE_SIZE = 24;
-type View = 'pokedex' | 'favorites' | 'compare';
+type View = 'pokedex' | 'favorites' | 'compare' | 'trunfo';
 
 export default function App() {
   const [view, setView] = useState<View>('pokedex');
@@ -176,6 +178,18 @@ export default function App() {
     return request;
   }
 
+  async function loadTrunfoCandidates(setup: TrunfoSetup) {
+    if (setup.mode === 'type') {
+      const data = await pokemonApi.byType(setup.type, 80, 0);
+      return data.results;
+    }
+
+    const maxOffset = Math.max(0, total > 100 ? total - 80 : 945);
+    const randomOffset = Math.floor(Math.random() * Math.max(1, maxOffset / 40)) * 40;
+    const data = await pokemonApi.list(80, randomOffset);
+    return data.results;
+  }
+
   function toggleFavorite(pokemon: PokemonSummary) {
     setFavorites((current) => current.some((item) => item.id === pokemon.id)
       ? current.filter((item) => item.id !== pokemon.id)
@@ -212,6 +226,9 @@ export default function App() {
             </button>
             <button className={view === 'compare' ? 'nav-pill nav-pill--active' : 'nav-pill'} onClick={() => setView('compare')}>
               <Swords size={16} /> Comparar <span>{compareSelection.length}/2</span>
+            </button>
+            <button className={view === 'trunfo' ? 'nav-pill nav-pill--active' : 'nav-pill'} onClick={() => setView('trunfo')}>
+              <Trophy size={16} /> Trunfo
             </button>
           </div>
         </nav>
@@ -272,6 +289,15 @@ export default function App() {
           isLoading={isCompareLoading}
           onClear={() => setCompareSelection([])}
           onOpen={openDetail}
+        />
+      )}
+
+      {view === 'trunfo' && (
+        <TrunfoPage
+          favorites={favorites}
+          types={types}
+          getCandidates={loadTrunfoCandidates}
+          loadDetail={loadDetail}
         />
       )}
 
