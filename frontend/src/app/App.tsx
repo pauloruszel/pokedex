@@ -1,0 +1,300 @@
+import { Database, Heart, LayoutGrid, Moon, Swords } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { CompareView } from '../features/compare/CompareView';
+import { FavoritesView } from '../features/favorites/FavoritesView';
+import { pokemonApi } from '../features/pokemon/api/pokemonApi';
+import { PokemonDetailDrawer } from '../features/pokemon/components/PokemonDetailDrawer';
+import { PokedexPage } from '../features/pokemon/pages/PokedexPage';
+import type { PokemonDetail, PokemonSummary } from '../features/pokemon/types/pokemon';
+import { useDebounce } from '../shared/hooks/useDebounce';
+import { ptBR } from '../shared/i18n/ptBR';
+import { useLocalStorage } from '../shared/hooks/useLocalStorage';
+import '../styles/global.css';
+
+const PAGE_SIZE = 24;
+type View = 'pokedex' | 'favorites' | 'compare';
+
+export default function App() {
+  const [view, setView] = useState<View>('pokedex');
+  const [pokemons, setPokemons] = useState<PokemonSummary[]>([]);
+  const [types, setTypes] = useState<string[]>([]);
+  const [selectedType, setSelectedType] = useState('all');
+  const [offset, setOffset] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 250);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [detail, setDetail] = useState<PokemonDetail | null>(null);
+  const [isDetailLoading, setIsDetailLoading] = useState(false);
+  const [compareDetails, setCompareDetails] = useState<PokemonDetail[]>([]);
+  const [isCompareLoading, setIsCompareLoading] = useState(false);
+  const [favorites, setFavorites] = useLocalStorage<PokemonSummary[]>('pokedex:favorites', []);
+  const [compareSelection, setCompareSelection] = useLocalStorage<PokemonSummary[]>('pokedex:compare', []);
+  const detailCache = useRef(new Map<number, PokemonDetail>());
+  const detailRequests = useRef(new Map<number, Promise<PokemonDetail>>());
+
+  const favoriteIds = useMemo(() => favorites.map((pokemon) => pokemon.id), [favorites]);
+  const compareIds = useMemo(() => compareSelection.map((pokemon) => pokemon.id), [compareSelection]);
+
+  useEffect(() => {
+    pokemonApi.types().then(setTypes).catch(() => setTypes([]));
+  }, []);
+
+  useEffect(() => {
+    loadPokemons(0, selectedType);
+  }, [selectedType]);
+
+  useEffect(() => {
+    if (!debouncedSearch.trim() && pokemons.length === 1 && total === 1) {
+      loadPokemons(0, selectedType);
+    }
+  }, [debouncedSearch]);
+
+  useEffect(() => {
+    if (isLoading || pokemons.length === 0) {
+      return;
+    }
+
+    const preload = () => pokemons.slice(0, 6).forEach(prefetchDetail);
+    const idleId = window.requestIdleCallback?.(preload, { timeout: 2500 });
+
+    if (!idleId) {
+      const timeoutId = window.setTimeout(preload, 700);
+      return () => window.clearTimeout(timeoutId);
+    }
+
+    return () => window.cancelIdleCallback?.(idleId);
+  }, [isLoading, pokemons]);
+
+  useEffect(() => {
+    if (compareSelection.length !== 2) {
+      setCompareDetails([]);
+      return;
+    }
+
+    let isActive = true;
+    setIsCompareLoading(true);
+    Promise.all(compareSelection.map((pokemon) => pokemonApi.detail(pokemon.id)))
+      .then((details) => {
+        if (isActive) setCompareDetails(details);
+      })
+      .catch(() => {
+        if (isActive) setCompareDetails([]);
+      })
+      .finally(() => {
+        if (isActive) setIsCompareLoading(false);
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, [compareSelection]);
+
+  async function loadPokemons(nextOffset = offset, type = selectedType) {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const data = type === 'all'
+        ? await pokemonApi.list(PAGE_SIZE, nextOffset)
+        : await pokemonApi.byType(type, PAGE_SIZE, nextOffset);
+
+      setPokemons(data.results);
+      setOffset(data.offset);
+      setTotal(data.count);
+    } catch {
+      setError(ptBR.errors.loadPokedex);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function submitSearch() {
+    if (!search.trim()) {
+      await loadPokemons(0, selectedType);
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const pokemon = await pokemonApi.search(search.trim());
+      setPokemons([{ id: pokemon.id, name: pokemon.name, imageUrl: pokemon.imageUrl, types: pokemon.types }]);
+      setTotal(1);
+      setOffset(0);
+    } catch {
+      setError(ptBR.errors.notFound);
+      setPokemons([]);
+      setTotal(0);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function openDetail(pokemon: PokemonSummary) {
+    const cached = detailCache.current.get(pokemon.id);
+    setDetail(cached ?? summaryToPreview(pokemon));
+    setIsDetailLoading(!cached);
+
+    if (cached) {
+      return;
+    }
+
+    try {
+      const loaded = await loadDetail(pokemon);
+      setDetail(loaded);
+    } finally {
+      setIsDetailLoading(false);
+    }
+  }
+
+  function prefetchDetail(pokemon: PokemonSummary) {
+    if (detailCache.current.has(pokemon.id) || detailRequests.current.has(pokemon.id)) {
+      return;
+    }
+    loadDetail(pokemon).catch(() => undefined);
+  }
+
+  function loadDetail(pokemon: PokemonSummary) {
+    const existing = detailRequests.current.get(pokemon.id);
+    if (existing) {
+      return existing;
+    }
+
+    const request = pokemonApi.detail(pokemon.id)
+      .then((loaded) => {
+        detailCache.current.set(pokemon.id, loaded);
+        return loaded;
+      })
+      .finally(() => {
+        detailRequests.current.delete(pokemon.id);
+      });
+
+    detailRequests.current.set(pokemon.id, request);
+    return request;
+  }
+
+  function toggleFavorite(pokemon: PokemonSummary) {
+    setFavorites((current) => current.some((item) => item.id === pokemon.id)
+      ? current.filter((item) => item.id !== pokemon.id)
+      : [...current, pokemon]);
+  }
+
+  function toggleCompare(pokemon: PokemonSummary) {
+    setCompareSelection((current) => {
+      if (current.some((item) => item.id === pokemon.id)) {
+        return current.filter((item) => item.id !== pokemon.id);
+      }
+      return [...current.slice(-1), pokemon];
+    });
+  }
+
+  function clearSearch() {
+    setSearch('');
+    loadPokemons(0, selectedType);
+  }
+
+  return (
+    <main className="app-shell">
+      <section className="hero-panel">
+        <div className="hero-orb hero-orb--one" />
+        <div className="hero-orb hero-orb--two" />
+        <nav className="top-nav">
+          <div className="brand-mark"><Database size={22} /> Pokédex Lab</div>
+          <div className="nav-actions">
+            <button className={view === 'pokedex' ? 'nav-pill nav-pill--active' : 'nav-pill'} onClick={() => setView('pokedex')}>
+              <LayoutGrid size={16} /> Explorar
+            </button>
+            <button className={view === 'favorites' ? 'nav-pill nav-pill--active' : 'nav-pill'} onClick={() => setView('favorites')}>
+              <Heart size={16} /> Favoritos <span>{favorites.length}</span>
+            </button>
+            <button className={view === 'compare' ? 'nav-pill nav-pill--active' : 'nav-pill'} onClick={() => setView('compare')}>
+              <Swords size={16} /> Comparar <span>{compareSelection.length}/2</span>
+            </button>
+          </div>
+        </nav>
+
+        <div className="hero-content">
+          <span className="eyebrow-line"><Moon size={16} /> Console premium com backend próprio</span>
+          <h1>Explore Pokémon como se estivesse em um laboratório de batalha.</h1>
+          <p>
+            Interface responsiva, favoritos locais, comparação de status, dossiê detalhado e imagens servidas somente pelo backend Java com cache persistente em Docker.
+          </p>
+        </div>
+      </section>
+
+      {view === 'pokedex' && (
+        <PokedexPage
+          pokemons={pokemons}
+          types={types}
+          selectedType={selectedType}
+          search={search}
+          total={total}
+          offset={offset}
+          pageSize={PAGE_SIZE}
+          isLoading={isLoading}
+          error={error}
+          favoriteIds={favoriteIds}
+          compareIds={compareIds}
+          onSearchChange={setSearch}
+          onSearchSubmit={submitSearch}
+          onClearSearch={clearSearch}
+          onTypeChange={(type) => {
+            setSelectedType(type);
+            setSearch('');
+          }}
+          onPageChange={(nextOffset) => loadPokemons(nextOffset, selectedType)}
+          onOpen={openDetail}
+          onPrefetch={prefetchDetail}
+          onToggleFavorite={toggleFavorite}
+          onToggleCompare={toggleCompare}
+        />
+      )}
+
+      {view === 'favorites' && (
+        <FavoritesView
+          favorites={favorites}
+          compareIds={compareIds}
+          onOpen={openDetail}
+          onPrefetch={prefetchDetail}
+          onToggleFavorite={toggleFavorite}
+          onToggleCompare={toggleCompare}
+          onClearFavorites={() => setFavorites([])}
+        />
+      )}
+
+      {view === 'compare' && (
+        <CompareView
+          compareSelection={compareSelection}
+          compareDetails={compareDetails}
+          isLoading={isCompareLoading}
+          onClear={() => setCompareSelection([])}
+          onOpen={openDetail}
+        />
+      )}
+
+      {compareSelection.length > 0 && view !== 'compare' && (
+        <button className="compare-floating" onClick={() => setView('compare')}>
+          <Swords size={18} /> Comparar {compareSelection.length}/2
+        </button>
+      )}
+
+      <PokemonDetailDrawer pokemon={detail} isLoading={isDetailLoading} onClose={() => setDetail(null)} />
+    </main>
+  );
+}
+
+function summaryToPreview(pokemon: PokemonSummary): PokemonDetail {
+  return {
+    ...pokemon,
+    spriteUrl: null,
+    height: 0,
+    weight: 0,
+    abilities: [],
+    stats: [],
+    species: {},
+    evolutionChain: []
+  };
+}

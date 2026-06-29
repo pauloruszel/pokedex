@@ -1,0 +1,50 @@
+server:
+  port: "${SERVER_PORT:8080}"
+
+spring:
+  application:
+    name: pokedex-backend
+  datasource:
+    url: "${SPRING_DATASOURCE_URL:jdbc:h2:file:./data/pokedex-db;AUTO_SERVER=FALSE;DB_CLOSE_DELAY=-1}"
+    username: "${SPRING_DATASOURCE_USERNAME:sa}"
+    password: "${SPRING_DATASOURCE_PASSWORD:}"
+    driver-class-name: org.h2.Driver
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/schema.sql
+      data-locations: classpath:db/data.sql
+      continue-on-error: false
+
+pokedex:
+  pokeapi:
+    base-url: "${POKEAPI_BASE_URL:https://pokeapi.co/api/v2}"
+  bootstrap:
+    enabled: "${POKEDEX_BOOTSTRAP_ENABLED:true}"
+    limit: "${POKEDEX_BOOTSTRAP_LIMIT:1025}"
+    details-enabled: "${POKEDEX_BOOTSTRAP_DETAILS_ENABLED:true}"
+  images:
+    storage-path: "${POKEDEX_IMAGES_STORAGE_PATH:./data/pokedex-images}"
+  translation:
+    enabled: "${POKEDEX_TRANSLATION_ENABLED:true}"
+    libretranslate-url: "${POKEDEX_TRANSLATION_LIBRETRANSLATE_URL:}"
+    url: "${POKEDEX_TRANSLATION_URL:https://api.mymemory.translated.net/get}"
+    fallback-url: "${POKEDEX_TRANSLATION_FALLBACK_URL:https://translate.googleapis.com}"
+    timeout-seconds: "${POKEDEX_TRANSLATION_TIMEOUT_SECONDS:8}"
+  admin:
+    enabled: "${POKEDEX_ADMIN_ENABLED:true}"
+    token: "${POKEDEX_ADMIN_TOKEN:local-dev-token}"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

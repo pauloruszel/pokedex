@@ -1,0 +1,78 @@
+services:
+  pokedex-backend:
+    build:
+      context: ./backend
+    container_name: pokedex-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SERVER_PORT=8080
+      - POKEAPI_BASE_URL=https://pokeapi.co/api/v2
+      - SPRING_DATASOURCE_URL=jdbc:h2:file:/data/h2/pokedex-db;AUTO_SERVER=FALSE;DB_CLOSE_DELAY=-1
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=
+      - POKEDEX_BOOTSTRAP_ENABLED=true
+      - POKEDEX_BOOTSTRAP_LIMIT=1025
+      - POKEDEX_BOOTSTRAP_DETAILS_ENABLED=true
+      - POKEDEX_IMAGES_STORAGE_PATH=/data/pokedex-images
+      - POKEDEX_TRANSLATION_ENABLED=true
+      - POKEDEX_TRANSLATION_LIBRETRANSLATE_URL=http://libretranslate:5000
+      - POKEDEX_TRANSLATION_URL=https://api.mymemory.translated.net/get
+      - POKEDEX_TRANSLATION_FALLBACK_URL=https://translate.googleapis.com
+      - POKEDEX_TRANSLATION_TIMEOUT_SECONDS=8
+      - POKEDEX_ADMIN_ENABLED=true
+      - POKEDEX_ADMIN_TOKEN=${POKEDEX_ADMIN_TOKEN:-local-dev-token}
+    volumes:
+      - pokedex-h2-data:/data/h2
+      - pokedex-images:/data/pokedex-images
+    depends_on:
+      libretranslate:
+        condition: service_started
+    networks:
+      - pokedex-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/actuator/health | grep -q UP"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  pokedex-frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: http://localhost:8080
+    container_name: pokedex-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      pokedex-backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/ >/dev/null"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - pokedex-network
+
+  libretranslate:
+    image: libretranslate/libretranslate:latest
+    container_name: pokedex-libretranslate
+    environment:
+      - LT_LOAD_ONLY=en,pt
+      - LT_UPDATE_MODELS=true
+    volumes:
+      - libretranslate-data:/home/libretranslate/.local/share
+    networks:
+      - pokedex-network
+
+volumes:
+  pokedex-h2-data:
+  pokedex-images:
+  libretranslate-data:
+
+networks:
+  pokedex-network:
+    driver: bridge
