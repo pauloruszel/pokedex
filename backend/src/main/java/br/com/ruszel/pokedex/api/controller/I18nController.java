@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @RestController
 @RequestMapping("/api/i18n")
@@ -14,7 +16,8 @@ public class I18nController {
     private final TranslateTextUseCase translateTextUseCase;
 
     @PostMapping("/translate")
-    public TranslateTextUseCase.TranslationResult translate(@RequestBody TranslateTextUseCase.TranslationRequest request) {
-        return translateTextUseCase.execute(request);
+    public Mono<TranslateTextUseCase.TranslationResult> translate(@RequestBody TranslateTextUseCase.TranslationRequest request) {
+        return Mono.fromCallable(() -> translateTextUseCase.execute(request))
+                .subscribeOn(Schedulers.boundedElastic());
     }
 }

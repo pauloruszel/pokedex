@@ -27,24 +27,28 @@ public class TranslateTextUseCase {
         }
 
         String key = key(kind, sourceLocale, targetLocale, sourceText);
-        String cached = jdbcClient.sql("""
-                        SELECT translated_text
+        CachedTranslation cached = jdbcClient.sql("""
+                        SELECT translated_text, translation_source
                           FROM pokemon_text_translation
                          WHERE translation_key = :key
                         """)
                 .param("key", key)
-                .query(String.class)
+                .query((rs, rowNum) -> new CachedTranslation(rs.getString("translated_text"), rs.getString("translation_source")))
                 .optional()
                 .orElse(null);
 
-        if (cached != null && !cached.isBlank()) {
-            return new TranslationResult(cached, targetLocale, "cache");
+        if (cached != null && isUsableCachedTranslation(sourceText, cached)) {
+            return new TranslationResult(cached.translatedText(), targetLocale, "cache");
         }
 
         String translated = translationGateway
                 .translate(sourceText, toProviderLanguage(sourceLocale), toProviderLanguage(targetLocale))
                 .orElse(sourceText);
         String source = translated.equals(sourceText) ? "fallback-source" : "external-provider";
+
+        if ("fallback-source".equals(source)) {
+            return new TranslationResult("", targetLocale, "untranslated");
+        }
 
         jdbcClient.sql("""
                         MERGE INTO pokemon_text_translation (
@@ -62,6 +66,30 @@ public class TranslateTextUseCase {
                 .update();
 
         return new TranslationResult(translated, targetLocale, source);
+    }
+
+    public CleanupResult cleanupInvalidCachedTranslations() {
+        int deleted = jdbcClient.sql("""
+                        DELETE FROM pokemon_text_translation
+                         WHERE locale IN ('es', 'en')
+                           AND (
+                                translation_source = 'fallback-source'
+                                OR TRIM(translated_text) = TRIM(source_text)
+                           )
+                        """)
+                .update();
+
+        return new CleanupResult(deleted);
+    }
+
+    private boolean isUsableCachedTranslation(String sourceText, CachedTranslation cached) {
+        if (cached.translatedText() == null || cached.translatedText().isBlank()) {
+            return false;
+        }
+        if ("fallback-source".equals(cached.translationSource())) {
+            return false;
+        }
+        return !normalizeText(cached.translatedText()).equalsIgnoreCase(sourceText);
     }
 
     private String normalizeText(String text) {
@@ -110,5 +138,11 @@ public class TranslateTextUseCase {
     }
 
     public record TranslationResult(String text, String locale, String source) {
+    }
+
+    public record CleanupResult(int deleted) {
+    }
+
+    private record CachedTranslation(String translatedText, String translationSource) {
     }
 }

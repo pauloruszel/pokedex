@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.reactive.resource.NoResourceFoundException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
@@ -46,6 +47,12 @@ public class GlobalExceptionHandler {
     public Mono<ResponseEntity<ApiError>> handleIllegalArgument(IllegalArgumentException exception, ServerWebExchange exchange) {
         log.warn("invalid request path={} message={}", exchange.getRequest().getPath(), exception.getMessage());
         return error(HttpStatus.BAD_REQUEST, exception.getMessage(), exchange);
+    }
+
+    @ExceptionHandler(ServerWebInputException.class)
+    public Mono<ResponseEntity<ApiError>> handleInvalidInput(ServerWebInputException exception, ServerWebExchange exchange) {
+        log.warn("invalid request body path={} message={}", exchange.getRequest().getPath(), exception.getMessage());
+        return error(HttpStatus.BAD_REQUEST, "Corpo da requisicao invalido.", exchange);
     }
 
     @ExceptionHandler(Exception.class)
