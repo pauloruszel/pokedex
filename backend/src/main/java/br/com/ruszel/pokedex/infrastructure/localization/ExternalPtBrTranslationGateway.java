@@ -33,24 +33,33 @@ public class ExternalPtBrTranslationGateway implements PtBrTranslationGateway {
 
     @Override
     public Optional<String> translate(String sourceText) {
+        return translate(sourceText, "en", "pt");
+    }
+
+    @Override
+    public Optional<String> translate(String sourceText, String sourceLanguage, String targetLanguage) {
         if (!enabled || sourceText == null || sourceText.isBlank()) {
             return Optional.empty();
         }
 
-        Optional<String> libreTranslate = translateWithLibreTranslate(sourceText);
+        if (sourceLanguage.equalsIgnoreCase(targetLanguage)) {
+            return Optional.of(clean(sourceText));
+        }
+
+        Optional<String> libreTranslate = translateWithLibreTranslate(sourceText, sourceLanguage, targetLanguage);
         if (libreTranslate.isPresent()) {
             return libreTranslate;
         }
 
-        Optional<String> primary = translateWithMyMemory(sourceText);
+        Optional<String> primary = translateWithMyMemory(sourceText, sourceLanguage, targetLanguage);
         if (primary.isPresent()) {
             return primary;
         }
 
-        return translateWithGooglePublicEndpoint(sourceText);
+        return translateWithGooglePublicEndpoint(sourceText, sourceLanguage, targetLanguage);
     }
 
-    private Optional<String> translateWithLibreTranslate(String sourceText) {
+    private Optional<String> translateWithLibreTranslate(String sourceText, String sourceLanguage, String targetLanguage) {
         if (libreTranslateUrl == null || libreTranslateUrl.isBlank()) {
             return Optional.empty();
         }
@@ -61,7 +70,7 @@ public class ExternalPtBrTranslationGateway implements PtBrTranslationGateway {
                     .build()
                     .post()
                     .uri("/translate")
-                    .bodyValue(new LibreTranslateRequest(sourceText, "en", "pt", "text"))
+                    .bodyValue(new LibreTranslateRequest(sourceText, sourceLanguage, normalizeTarget(targetLanguage), "text"))
                     .retrieve()
                     .bodyToMono(JsonNode.class)
                     .block(Duration.ofSeconds(timeoutSeconds));
@@ -78,7 +87,7 @@ public class ExternalPtBrTranslationGateway implements PtBrTranslationGateway {
         }
     }
 
-    private Optional<String> translateWithMyMemory(String sourceText) {
+    private Optional<String> translateWithMyMemory(String sourceText, String sourceLanguage, String targetLanguage) {
         try {
             JsonNode response = webClientBuilder.clone()
                     .baseUrl(translationUrl)
@@ -86,7 +95,7 @@ public class ExternalPtBrTranslationGateway implements PtBrTranslationGateway {
                     .get()
                     .uri(uri -> uri
                             .queryParam("q", sourceText)
-                            .queryParam("langpair", "en|pt-BR")
+                            .queryParam("langpair", normalizeSource(sourceLanguage) + "|" + normalizeMyMemoryTarget(targetLanguage))
                             .build())
                     .retrieve()
                     .bodyToMono(JsonNode.class)
@@ -107,7 +116,7 @@ public class ExternalPtBrTranslationGateway implements PtBrTranslationGateway {
         }
     }
 
-    private Optional<String> translateWithGooglePublicEndpoint(String sourceText) {
+    private Optional<String> translateWithGooglePublicEndpoint(String sourceText, String sourceLanguage, String targetLanguage) {
         try {
             JsonNode response = webClientBuilder.clone()
                     .baseUrl(fallbackTranslationUrl)
@@ -116,8 +125,8 @@ public class ExternalPtBrTranslationGateway implements PtBrTranslationGateway {
                     .uri(uri -> uri
                             .path("/translate_a/single")
                             .queryParam("client", "gtx")
-                            .queryParam("sl", "en")
-                            .queryParam("tl", "pt")
+                            .queryParam("sl", normalizeSource(sourceLanguage))
+                            .queryParam("tl", normalizeTarget(targetLanguage))
                             .queryParam("dt", "t")
                             .queryParam("q", sourceText)
                             .build())
@@ -148,6 +157,35 @@ public class ExternalPtBrTranslationGateway implements PtBrTranslationGateway {
                 .replace("POKéMON", "Pokémon")
                 .replace("POKÉMON", "Pokémon")
                 .trim();
+    }
+
+    private String normalizeSource(String language) {
+        if (language == null || language.isBlank()) {
+            return "auto";
+        }
+        return normalizeTarget(language);
+    }
+
+    private String normalizeTarget(String language) {
+        if (language == null || language.isBlank()) {
+            return "pt";
+        }
+        String normalized = language.trim().toLowerCase();
+        if (normalized.startsWith("pt")) {
+            return "pt";
+        }
+        if (normalized.startsWith("es")) {
+            return "es";
+        }
+        if (normalized.startsWith("en")) {
+            return "en";
+        }
+        return normalized;
+    }
+
+    private String normalizeMyMemoryTarget(String language) {
+        String normalized = normalizeTarget(language);
+        return normalized.equals("pt") ? "pt-BR" : normalized;
     }
 
     private record LibreTranslateRequest(String q, String source, String target, String format) {

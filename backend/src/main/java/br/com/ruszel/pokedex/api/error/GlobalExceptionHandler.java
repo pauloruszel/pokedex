@@ -42,6 +42,12 @@ public class GlobalExceptionHandler {
         return error(HttpStatus.NOT_FOUND, "Recurso nao encontrado.", exchange);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public Mono<ResponseEntity<ApiError>> handleIllegalArgument(IllegalArgumentException exception, ServerWebExchange exchange) {
+        log.warn("invalid request path={} message={}", exchange.getRequest().getPath(), exception.getMessage());
+        return error(HttpStatus.BAD_REQUEST, exception.getMessage(), exchange);
+    }
+
     @ExceptionHandler(Exception.class)
     public Mono<ResponseEntity<ApiError>> handleGeneric(Exception exception, ServerWebExchange exchange) {
         log.error("unexpected API error path={}", exchange.getRequest().getPath(), exception);

@@ -1,4 +1,5 @@
 import type { PokemonDetail, PokemonStat, PokemonSummary } from '../../pokemon/types/pokemon';
+import type { Messages } from '../../../shared/i18n/messages';
 import type {
   AttributeOption,
   RoundResult,
@@ -93,8 +94,42 @@ export function formatAttributeValue(attribute: TrunfoAttributeKey, value: numbe
   return option?.unit ? `${value} ${option.unit}` : String(value);
 }
 
-export function getAttributeLabel(attribute: TrunfoAttributeKey) {
+export function getAttributeLabel(attribute: TrunfoAttributeKey, messages?: Messages) {
+  if (messages) {
+    const labels: Record<TrunfoAttributeKey, string> = {
+      hp: messages.attributes.hp,
+      attack: messages.attributes.attack,
+      defense: messages.attributes.defense,
+      specialAttack: messages.attributes.specialAttack,
+      specialDefense: messages.attributes.specialDefense,
+      speed: messages.attributes.speed,
+      weight: messages.attributes.weight,
+      height: messages.attributes.height,
+      total: messages.attributes.total
+    };
+    return labels[attribute];
+  }
+
   return ATTRIBUTE_OPTIONS.find((item) => item.key === attribute)?.label ?? attribute;
+}
+
+export function getAttributeShortLabel(attribute: TrunfoAttributeKey, messages?: Messages) {
+  if (messages) {
+    const labels: Record<TrunfoAttributeKey, string> = {
+      hp: messages.attributes.hp,
+      attack: messages.attributes.shortAttack,
+      defense: messages.attributes.shortDefense,
+      specialAttack: messages.attributes.shortSpecialAttack,
+      specialDefense: messages.attributes.shortSpecialDefense,
+      speed: messages.attributes.shortSpeed,
+      weight: messages.attributes.shortWeight,
+      height: messages.attributes.shortHeight,
+      total: messages.attributes.total
+    };
+    return labels[attribute];
+  }
+
+  return ATTRIBUTE_OPTIONS.find((item) => item.key === attribute)?.shortLabel ?? attribute;
 }
 
 export function chooseCpuAttribute(card: TrunfoCardModel, difficulty: TrunfoDifficulty): TrunfoAttributeKey {
@@ -129,12 +164,12 @@ export function getRarity(total: number): TrunfoRarity {
   return 'comum';
 }
 
-export function getRarityLabel(rarity: TrunfoRarity) {
+export function getRarityLabel(rarity: TrunfoRarity, messages?: Messages) {
   const labels: Record<TrunfoRarity, string> = {
-    comum: 'Comum',
-    rara: 'Rara',
-    epica: 'Épica',
-    lendaria: 'Lendária'
+    comum: messages?.trunfo.rarityCommon ?? 'Comum',
+    rara: messages?.trunfo.rarityRare ?? 'Rara',
+    epica: messages?.trunfo.rarityEpic ?? 'Épica',
+    lendaria: messages?.trunfo.rarityLegendary ?? 'Lendária'
   };
 
   return labels[rarity];

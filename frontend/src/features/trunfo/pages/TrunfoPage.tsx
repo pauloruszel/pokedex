@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useI18n } from '../../../shared/i18n/I18nProvider';
 import type { PokemonDetail, PokemonSummary } from '../../pokemon/types/pokemon';
 import { BattlePanel } from '../components/BattlePanel';
 import { GameSetup } from '../components/GameSetup';
@@ -14,6 +15,7 @@ type Props = {
 };
 
 export function TrunfoPage({ favorites, types, getCandidates, loadDetail }: Props) {
+  const { messages } = useI18n();
   const [setup, setSetup] = useState<TrunfoSetup>({
     mode: 'all',
     type: types[0] ?? 'normal',
@@ -40,7 +42,7 @@ export function TrunfoPage({ favorites, types, getCandidates, loadDetail }: Prop
         loadDetail
       });
     } catch {
-      setSetupError('Não foi possível montar o baralho agora.');
+      setSetupError(messages.trunfo.setupError);
     } finally {
       setIsPreparing(false);
     }
@@ -54,7 +56,7 @@ export function TrunfoPage({ favorites, types, getCandidates, loadDetail }: Prop
           types={types}
           favoritesCount={favorites.length}
           isLoading={game.status === 'loading' || isPreparing}
-          error={setupError ?? game.error}
+          error={setupError ?? (game.error ? messages.trunfo.setupError : null)}
           onChange={setSetup}
           onStart={startGame}
         />

@@ -1,5 +1,5 @@
 import { Heart, Trash2 } from 'lucide-react';
-import { ptBR } from '../../shared/i18n/ptBR';
+import { useI18n } from '../../shared/i18n/I18nProvider';
 import { PokemonCard } from '../pokemon/components/PokemonCard';
 import type { PokemonSummary } from '../pokemon/types/pokemon';
 
@@ -14,12 +14,14 @@ type Props = {
 };
 
 export function FavoritesView({ favorites, compareIds, onOpen, onPrefetch, onToggleFavorite, onToggleCompare, onClearFavorites }: Props) {
+  const { messages } = useI18n();
+
   if (favorites.length === 0) {
     return (
       <section className="empty-state">
         <Heart size={38} />
-        <h2>{ptBR.favorites.emptyTitle}</h2>
-        <p>{ptBR.favorites.emptyDescription}</p>
+        <h2>{messages.favorites.emptyTitle}</h2>
+        <p>{messages.favorites.emptyDescription}</p>
       </section>
     );
   }
@@ -28,11 +30,11 @@ export function FavoritesView({ favorites, compareIds, onOpen, onPrefetch, onTog
     <>
       <section className="section-heading">
         <div>
-          <span className="eyebrow-line">Coleção local</span>
-          <h2>Favoritos</h2>
+          <span className="eyebrow-line">{messages.favorites.eyebrow}</span>
+          <h2>{messages.favorites.title}</h2>
         </div>
         <button className="secondary-control" onClick={onClearFavorites}>
-          <Trash2 size={17} /> {ptBR.favorites.clear}
+          <Trash2 size={17} /> {messages.favorites.clear}
         </button>
       </section>
 

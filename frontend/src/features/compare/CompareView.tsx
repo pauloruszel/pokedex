@@ -1,9 +1,9 @@
 import { Swords, Trash2 } from 'lucide-react';
 import { StatBar } from '../../shared/components/StatBar';
 import { TypeBadge } from '../../shared/components/TypeBadge';
-import { ptBR } from '../../shared/i18n/ptBR';
+import { useI18n } from '../../shared/i18n/I18nProvider';
 import { assetUrl } from '../../shared/utils/assets';
-import { formatPokemonName, formatPokemonNumber, formatStatName } from '../../shared/utils/format';
+import { formatPokemonName, formatPokemonNumber } from '../../shared/utils/format';
 import type { PokemonDetail, PokemonSummary } from '../pokemon/types/pokemon';
 
 type Props = {
@@ -17,18 +17,20 @@ type Props = {
 const statOrder = ['hp', 'attack', 'defense', 'special-attack', 'special-defense', 'speed'];
 
 export function CompareView({ compareSelection, compareDetails, isLoading, onClear, onOpen }: Props) {
+  const { messages } = useI18n();
+
   if (compareSelection.length < 2) {
     return (
       <section className="empty-state empty-state--compare">
         <Swords size={42} />
-        <h2>{ptBR.compare.title}</h2>
-        <p>{ptBR.compare.emptyDescription}</p>
+        <h2>{messages.compare.title}</h2>
+        <p>{messages.compare.emptyDescription}</p>
       </section>
     );
   }
 
   if (isLoading || compareDetails.length < 2) {
-    return <section className="empty-state"><div className="pokeball-loader" /><h2>{ptBR.compare.loading}</h2></section>;
+    return <section className="empty-state"><div className="pokeball-loader" /><h2>{messages.compare.loading}</h2></section>;
   }
 
   const [first, second] = compareDetails;
@@ -37,11 +39,11 @@ export function CompareView({ compareSelection, compareDetails, isLoading, onCle
     <section className="compare-board">
       <header className="compare-header">
         <div>
-          <span className="eyebrow-line"><Swords size={17} /> {ptBR.compare.eyebrow}</span>
+          <span className="eyebrow-line"><Swords size={17} /> {messages.compare.eyebrow}</span>
           <h2>{formatPokemonName(first.name)} vs {formatPokemonName(second.name)}</h2>
-          <p>{ptBR.compare.description}</p>
+          <p>{messages.compare.description}</p>
         </div>
-        <button className="secondary-control" onClick={onClear}><Trash2 size={17} /> {ptBR.common.clear}</button>
+        <button className="secondary-control" onClick={onClear}><Trash2 size={17} /> {messages.common.clear}</button>
       </header>
 
       <div className="fighters-grid">
@@ -64,7 +66,7 @@ export function CompareView({ compareSelection, compareDetails, isLoading, onCle
           return (
             <div className="compare-row" key={statName}>
               <div className={firstStat >= secondStat ? 'stat-winner' : ''}>{firstStat}</div>
-              <strong>{formatStatName(statName)}</strong>
+              <strong>{statLabel(statName, messages)}</strong>
               <div className={secondStat >= firstStat ? 'stat-winner' : ''}>{secondStat}</div>
             </div>
           );
@@ -83,4 +85,17 @@ export function CompareView({ compareSelection, compareDetails, isLoading, onCle
       </div>
     </section>
   );
+}
+
+function statLabel(name: string, messages: ReturnType<typeof useI18n>['messages']) {
+  const map: Record<string, string> = {
+    hp: messages.attributes.hp,
+    attack: messages.attributes.attack,
+    defense: messages.attributes.defense,
+    'special-attack': messages.attributes.specialAttack,
+    'special-defense': messages.attributes.specialDefense,
+    speed: messages.attributes.speed
+  };
+
+  return map[name] ?? name;
 }

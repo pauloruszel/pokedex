@@ -1,11 +1,12 @@
 import { Crown, HelpCircle, ShieldQuestion, Sparkles } from 'lucide-react';
 import type { CSSProperties } from 'react';
 import { TypeBadge } from '../../../shared/components/TypeBadge';
+import { useI18n } from '../../../shared/i18n/I18nProvider';
 import { assetUrl } from '../../../shared/utils/assets';
 import { formatPokemonName, formatPokemonNumber } from '../../../shared/utils/format';
 import { getTypeTheme } from '../../../shared/utils/typeTheme';
 import type { TrunfoAttributeKey, TrunfoCardModel } from '../types/trunfo';
-import { ATTRIBUTE_OPTIONS, formatAttributeValue, getRarityLabel } from '../utils/trunfoRules';
+import { ATTRIBUTE_OPTIONS, formatAttributeValue, getAttributeShortLabel, getRarityLabel } from '../utils/trunfoRules';
 
 type Props = {
   card: TrunfoCardModel | null;
@@ -16,14 +17,16 @@ type Props = {
 };
 
 export function TrunfoCard({ card, side, isHidden = false, selectedAttribute, winningAttribute }: Props) {
+  const { messages } = useI18n();
+
   if (!card || isHidden) {
     return (
       <article className="trunfo-card trunfo-card--back trunfo-card--face-down">
         <div className="trunfo-card-back-symbol">
           <ShieldQuestion size={42} />
         </div>
-        <strong>{side === 'cpu' ? 'Carta da CPU' : 'Carta oculta'}</strong>
-        <span>Escolha um atributo para revelar o duelo.</span>
+        <strong>{side === 'cpu' ? messages.trunfo.cpuCard : messages.trunfo.hiddenCard}</strong>
+        <span>{messages.trunfo.revealHint}</span>
       </article>
     );
   }
@@ -39,7 +42,7 @@ export function TrunfoCard({ card, side, isHidden = false, selectedAttribute, wi
     >
       <header className="trunfo-card-header">
         <span>{formatPokemonNumber(card.id)}</span>
-        <strong><Sparkles size={14} /> {getRarityLabel(card.rarity)}</strong>
+        <strong><Sparkles size={14} /> {getRarityLabel(card.rarity, messages)}</strong>
       </header>
 
       <div className="trunfo-card-image">
@@ -68,7 +71,7 @@ export function TrunfoCard({ card, side, isHidden = false, selectedAttribute, wi
               ].filter(Boolean).join(' ')}
               key={option.key}
             >
-              <span>{option.shortLabel}</span>
+              <span>{getAttributeShortLabel(option.key, messages)}</span>
               <strong>{formatAttributeValue(option.key, card.attributes[option.key])}</strong>
             </div>
           );
@@ -77,7 +80,7 @@ export function TrunfoCard({ card, side, isHidden = false, selectedAttribute, wi
 
       {card.legendaryCharge && (
         <div className="trunfo-legendary-rule">
-          <HelpCircle size={15} /> vence empate uma vez
+          <HelpCircle size={15} /> {messages.trunfo.legendaryRule}
         </div>
       )}
     </article>
