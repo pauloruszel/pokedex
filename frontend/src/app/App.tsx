@@ -212,7 +212,7 @@ export default function App() {
 
   return (
     <main className="app-shell">
-      <section className="hero-panel">
+      <section className={view === 'trunfo' ? 'hero-panel hero-panel--game' : 'hero-panel'}>
         <div className="hero-orb hero-orb--one" />
         <div className="hero-orb hero-orb--two" />
         <nav className="top-nav">
@@ -233,7 +233,17 @@ export default function App() {
           </div>
         </nav>
 
-        <div className="hero-content">
+        {view === 'trunfo' && (
+          <div className="hero-content hero-content--trunfo">
+            <span className="eyebrow-line"><Trophy size={16} /> Modo competitivo de cartas</span>
+            <h1>Super Trunfo Pokémon</h1>
+            <p>
+              Monte um baralho com dados reais da Pokédex, escolha atributos com estratégia e dispute carta por carta contra a CPU.
+            </p>
+          </div>
+        )}
+
+        <div className={view === 'trunfo' ? 'hero-content hero-content--hidden' : 'hero-content'}>
           <span className="eyebrow-line"><Moon size={16} /> Console premium com backend próprio</span>
           <h1>Explore Pokémon como se estivesse em um laboratório de batalha.</h1>
           <p>
