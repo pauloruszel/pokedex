@@ -1,4 +1,4 @@
-import { Database, Heart, LayoutGrid, Moon, Swords } from 'lucide-react';
+import { Database, Heart, LayoutGrid, Moon, Swords, Trophy } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { CompareView } from '../features/compare/CompareView';
 import { FavoritesView } from '../features/favorites/FavoritesView';
@@ -6,15 +6,19 @@ import { pokemonApi } from '../features/pokemon/api/pokemonApi';
 import { PokemonDetailDrawer } from '../features/pokemon/components/PokemonDetailDrawer';
 import { PokedexPage } from '../features/pokemon/pages/PokedexPage';
 import type { PokemonDetail, PokemonSummary } from '../features/pokemon/types/pokemon';
+import { TrunfoPage } from '../features/trunfo/pages/TrunfoPage';
+import type { TrunfoSetup } from '../features/trunfo/types/trunfo';
 import { useDebounce } from '../shared/hooks/useDebounce';
-import { ptBR } from '../shared/i18n/ptBR';
 import { useLocalStorage } from '../shared/hooks/useLocalStorage';
+import { LanguageSwitcher } from '../shared/i18n/LanguageSwitcher';
+import { useI18n } from '../shared/i18n/I18nProvider';
 import '../styles/global.css';
 
 const PAGE_SIZE = 24;
-type View = 'pokedex' | 'favorites' | 'compare';
+type View = 'pokedex' | 'favorites' | 'compare' | 'trunfo';
 
 export default function App() {
+  const { messages } = useI18n();
   const [view, setView] = useState<View>('pokedex');
   const [pokemons, setPokemons] = useState<PokemonSummary[]>([]);
   const [types, setTypes] = useState<string[]>([]);
@@ -104,7 +108,7 @@ export default function App() {
       setOffset(data.offset);
       setTotal(data.count);
     } catch {
-      setError(ptBR.errors.loadPokedex);
+      setError(messages.errors.loadPokedex);
     } finally {
       setIsLoading(false);
     }
@@ -125,7 +129,7 @@ export default function App() {
       setTotal(1);
       setOffset(0);
     } catch {
-      setError(ptBR.errors.notFound);
+      setError(messages.errors.notFound);
       setPokemons([]);
       setTotal(0);
     } finally {
@@ -176,6 +180,18 @@ export default function App() {
     return request;
   }
 
+  async function loadTrunfoCandidates(setup: TrunfoSetup) {
+    if (setup.mode === 'type') {
+      const data = await pokemonApi.byType(setup.type, 80, 0);
+      return data.results;
+    }
+
+    const maxOffset = Math.max(0, total > 100 ? total - 80 : 945);
+    const randomOffset = Math.floor(Math.random() * Math.max(1, maxOffset / 40)) * 40;
+    const data = await pokemonApi.list(80, randomOffset);
+    return data.results;
+  }
+
   function toggleFavorite(pokemon: PokemonSummary) {
     setFavorites((current) => current.some((item) => item.id === pokemon.id)
       ? current.filter((item) => item.id !== pokemon.id)
@@ -198,29 +214,43 @@ export default function App() {
 
   return (
     <main className="app-shell">
-      <section className="hero-panel">
+      <section className={view === 'trunfo' ? 'hero-panel hero-panel--game' : 'hero-panel'}>
         <div className="hero-orb hero-orb--one" />
         <div className="hero-orb hero-orb--two" />
         <nav className="top-nav">
-          <div className="brand-mark"><Database size={22} /> Pokédex Lab</div>
+          <div className="brand-mark"><Database size={22} /> {messages.hero.brand}</div>
           <div className="nav-actions">
             <button className={view === 'pokedex' ? 'nav-pill nav-pill--active' : 'nav-pill'} onClick={() => setView('pokedex')}>
-              <LayoutGrid size={16} /> Explorar
+              <LayoutGrid size={16} /> {messages.nav.explore}
             </button>
             <button className={view === 'favorites' ? 'nav-pill nav-pill--active' : 'nav-pill'} onClick={() => setView('favorites')}>
-              <Heart size={16} /> Favoritos <span>{favorites.length}</span>
+              <Heart size={16} /> {messages.nav.favorites} <span>{favorites.length}</span>
             </button>
             <button className={view === 'compare' ? 'nav-pill nav-pill--active' : 'nav-pill'} onClick={() => setView('compare')}>
-              <Swords size={16} /> Comparar <span>{compareSelection.length}/2</span>
+              <Swords size={16} /> {messages.nav.compare} <span>{compareSelection.length}/2</span>
             </button>
+            <button className={view === 'trunfo' ? 'nav-pill nav-pill--active' : 'nav-pill'} onClick={() => setView('trunfo')}>
+              <Trophy size={16} /> {messages.nav.trunfo}
+            </button>
+            <LanguageSwitcher />
           </div>
         </nav>
 
-        <div className="hero-content">
-          <span className="eyebrow-line"><Moon size={16} /> Console premium com backend próprio</span>
-          <h1>Explore Pokémon como se estivesse em um laboratório de batalha.</h1>
+        {view === 'trunfo' && (
+          <div className="hero-content hero-content--trunfo">
+            <span className="eyebrow-line"><Trophy size={16} /> {messages.hero.trunfoEyebrow}</span>
+            <h1>{messages.hero.trunfoTitle}</h1>
+            <p>
+              {messages.hero.trunfoDescription}
+            </p>
+          </div>
+        )}
+
+        <div className={view === 'trunfo' ? 'hero-content hero-content--hidden' : 'hero-content'}>
+          <span className="eyebrow-line"><Moon size={16} /> {messages.hero.eyebrow}</span>
+          <h1>{messages.hero.title}</h1>
           <p>
-            Interface responsiva, favoritos locais, comparação de status, dossiê detalhado e imagens servidas somente pelo backend Java com cache persistente em Docker.
+            {messages.hero.description}
           </p>
         </div>
       </section>
@@ -275,9 +305,18 @@ export default function App() {
         />
       )}
 
+      {view === 'trunfo' && (
+        <TrunfoPage
+          favorites={favorites}
+          types={types}
+          getCandidates={loadTrunfoCandidates}
+          loadDetail={loadDetail}
+        />
+      )}
+
       {compareSelection.length > 0 && view !== 'compare' && (
         <button className="compare-floating" onClick={() => setView('compare')}>
-          <Swords size={18} /> Comparar {compareSelection.length}/2
+          <Swords size={18} /> {messages.nav.compare} {compareSelection.length}/2
         </button>
       )}
 

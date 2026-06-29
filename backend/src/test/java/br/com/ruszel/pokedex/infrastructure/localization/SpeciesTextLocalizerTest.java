@@ -34,7 +34,17 @@ class SpeciesTextLocalizerTest {
         jdbcTemplate.execute("DELETE FROM pokemon_text_translation");
         localizer = new SpeciesTextLocalizer(
                 JdbcClient.create(dataSource),
-                source -> Optional.of("Quando vários desses Pokémon se reúnem, sua eletricidade pode se acumular e causar tempestades de raios.")
+                new PtBrTranslationGateway() {
+                    @Override
+                    public Optional<String> translate(String sourceText) {
+                        return Optional.of("Quando vários desses Pokémon se reúnem, sua eletricidade pode se acumular e causar tempestades de raios.");
+                    }
+
+                    @Override
+                    public Optional<String> translate(String sourceText, String sourceLanguage, String targetLanguage) {
+                        return translate(sourceText);
+                    }
+                }
         );
     }
 

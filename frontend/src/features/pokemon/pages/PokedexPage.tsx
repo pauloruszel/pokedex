@@ -1,6 +1,6 @@
 import { ChevronLeft, ChevronRight, SearchX } from 'lucide-react';
 import { PokemonGridSkeleton } from '../../../shared/components/Skeleton';
-import { ptBR } from '../../../shared/i18n/ptBR';
+import { useI18n } from '../../../shared/i18n/I18nProvider';
 import { PokemonCard } from '../components/PokemonCard';
 import { SearchCommand } from '../components/SearchCommand';
 import type { PokemonSummary } from '../types/pokemon';
@@ -50,6 +50,7 @@ export function PokedexPage({
   onToggleFavorite,
   onToggleCompare
 }: Props) {
+  const { messages } = useI18n();
   const currentPage = Math.floor(offset / pageSize) + 1;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
@@ -67,10 +68,10 @@ export function PokedexPage({
 
       <section className="section-heading">
         <div>
-          <span className="eyebrow-line">{ptBR.pokedex.eyebrow}</span>
-          <h2>{ptBR.pokedex.title}</h2>
+          <span className="eyebrow-line">{messages.pokedex.eyebrow}</span>
+          <h2>{messages.pokedex.title}</h2>
         </div>
-        <strong>{total} {ptBR.pokedex.records}</strong>
+        <strong>{total} {messages.pokedex.records}</strong>
       </section>
 
       {error && <div className="error-box">{error}</div>}
@@ -80,8 +81,8 @@ export function PokedexPage({
       ) : pokemons.length === 0 ? (
         <section className="empty-state">
           <SearchX size={38} />
-          <h2>{ptBR.pokedex.emptyTitle}</h2>
-          <p>{ptBR.pokedex.emptyDescription}</p>
+          <h2>{messages.pokedex.emptyTitle}</h2>
+          <p>{messages.pokedex.emptyDescription}</p>
         </section>
       ) : (
         <section className="pokemon-grid">
@@ -102,11 +103,11 @@ export function PokedexPage({
 
       <footer className="pagination">
         <button className="secondary-control" disabled={offset <= 0 || isLoading} onClick={() => onPageChange(Math.max(0, offset - pageSize))}>
-          <ChevronLeft size={18} /> {ptBR.pokedex.previous}
+          <ChevronLeft size={18} /> {messages.pokedex.previous}
         </button>
-        <span>{ptBR.pokedex.page} {currentPage} de {totalPages}</span>
+        <span>{messages.pokedex.page} {currentPage} {messages.pokedex.of} {totalPages}</span>
         <button className="secondary-control" disabled={offset + pageSize >= total || isLoading} onClick={() => onPageChange(offset + pageSize)}>
-          {ptBR.pokedex.next} <ChevronRight size={18} />
+          {messages.pokedex.next} <ChevronRight size={18} />
         </button>
       </footer>
     </>

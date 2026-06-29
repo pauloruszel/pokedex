@@ -16,7 +16,7 @@ services:
       - POKEDEX_BOOTSTRAP_DETAILS_ENABLED=true
       - POKEDEX_IMAGES_STORAGE_PATH=/data/pokedex-images
       - POKEDEX_TRANSLATION_ENABLED=true
-      - POKEDEX_TRANSLATION_LIBRETRANSLATE_URL=http://libretranslate:5000
+      - POKEDEX_TRANSLATION_LIBRETRANSLATE_URL=
       - POKEDEX_TRANSLATION_URL=https://api.mymemory.translated.net/get
       - POKEDEX_TRANSLATION_FALLBACK_URL=https://translate.googleapis.com
       - POKEDEX_TRANSLATION_TIMEOUT_SECONDS=8
@@ -25,9 +25,6 @@ services:
     volumes:
       - pokedex-h2-data:/data/h2
       - pokedex-images:/data/pokedex-images
-    depends_on:
-      libretranslate:
-        condition: service_started
     networks:
       - pokedex-network
     healthcheck:
@@ -60,8 +57,10 @@ services:
   libretranslate:
     image: libretranslate/libretranslate:latest
     container_name: pokedex-libretranslate
+    profiles:
+      - optional-translation
     environment:
-      - LT_LOAD_ONLY=en,pt
+      - LT_LOAD_ONLY=en,pt,es
       - LT_UPDATE_MODELS=true
     volumes:
       - libretranslate-data:/home/libretranslate/.local/share

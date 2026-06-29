@@ -1,0 +1,478 @@
+export type AppLanguage = 'pt-BR' | 'es' | 'en';
+
+export const languageOptions: Array<{ code: AppLanguage; label: string; shortLabel: string; flag: string }> = [
+  { code: 'pt-BR', label: 'Português', shortLabel: 'PT', flag: '🇧🇷' },
+  { code: 'es', label: 'Español', shortLabel: 'ES', flag: '🇪🇸' },
+  { code: 'en', label: 'English', shortLabel: 'EN', flag: '🇺🇸' }
+];
+
+export const messages = {
+  ptBR: {
+    common: {
+      clear: 'Limpar',
+      all: 'Todos',
+      you: 'Você',
+      cpu: 'CPU',
+      draw: 'Empate'
+    },
+    nav: {
+      explore: 'Explorar',
+      favorites: 'Favoritos',
+      compare: 'Comparar',
+      trunfo: 'Trunfo'
+    },
+    language: {
+      label: 'Idioma',
+      changeTo: 'Alterar idioma para'
+    },
+    hero: {
+      brand: 'Pokédex Lab',
+      eyebrow: 'Console premium com backend próprio',
+      title: 'Explore Pokémon como se estivesse em um laboratório de batalha.',
+      description: 'Interface responsiva, favoritos locais, comparação de status, dossiê detalhado e imagens servidas somente pelo backend Java com cache persistente em Docker.',
+      trunfoEyebrow: 'Modo competitivo de cartas',
+      trunfoTitle: 'Super Trunfo Pokémon',
+      trunfoDescription: 'Monte um baralho com dados reais da Pokédex, escolha atributos com estratégia e dispute carta por carta contra a CPU.'
+    },
+    search: {
+      placeholder: 'Busque por nome ou número: pikachu, charizard, 25...',
+      submit: 'Buscar',
+      quickTypes: 'Tipos rápidos',
+      allTypes: 'Todos'
+    },
+    pokedex: {
+      eyebrow: 'Discovery Grid',
+      title: 'Pokémon encontrados',
+      records: 'registros',
+      emptyTitle: 'Nenhum Pokémon encontrado',
+      emptyDescription: 'Ajuste a busca, limpe o filtro ou escolha outro tipo para ver novos resultados.',
+      previous: 'Anterior',
+      next: 'Próxima',
+      page: 'Página',
+      of: 'de'
+    },
+    card: {
+      openDetails: 'Abrir detalhes de',
+      favorite: 'Favoritar',
+      compare: 'Comparar',
+      inspect: 'Ver dossiê'
+    },
+    detail: {
+      close: 'Fechar detalhes',
+      loading: 'Carregando dossiê Pokémon...',
+      fallbackGenus: 'Pokémon',
+      noDescription: 'Nenhuma descrição disponível para esta espécie.',
+      progress: 'Carregando atributos, habilidades e linha evolutiva...',
+      height: 'Altura',
+      weight: 'Peso',
+      generation: 'Geração',
+      habitat: 'Habitat',
+      stats: 'Status base',
+      abilities: 'Habilidades',
+      gallery: 'Galeria',
+      evolution: 'Linha evolutiva',
+      noEvolution: 'Sem cadeia evolutiva disponível'
+    },
+    favorites: {
+      eyebrow: 'Coleção local',
+      title: 'Favoritos',
+      emptyTitle: 'Nenhum favorito ainda',
+      emptyDescription: 'Marque seus Pokémon preferidos no coração dos cards para montar sua coleção local.',
+      clear: 'Limpar favoritos'
+    },
+    compare: {
+      title: 'Comparador de Pokémon',
+      emptyDescription: 'Selecione dois Pokémon usando o botão "+" nos cards. A comparação destaca o vencedor em cada atributo.',
+      loading: 'Montando comparação...',
+      eyebrow: 'Battle Lab',
+      description: 'Comparação técnica por status base, tipo, altura e peso.'
+    },
+    trunfo: {
+      setupEyebrow: 'Super Trunfo Pokémon',
+      setupTitle: 'Monte seu baralho e vença a CPU carta por carta.',
+      setupDescription: 'Uma partida rápida com 20 cartas para cada lado, atributos reais da Pokédex e raridade calculada pelo total de status.',
+      deck: 'Baralho',
+      modeAll: 'Todos',
+      modeFavorites: 'Favoritos',
+      modeType: 'Por tipo',
+      favoriteRequirement: 'Use pelo menos 40 favoritos para uma partida completa.',
+      difficulty: 'Dificuldade',
+      balanced: 'Equilibrado',
+      balancedDescription: 'CPU escolhe entre bons atributos.',
+      casual: 'Casual',
+      casualDescription: 'CPU joga de forma imprevisível.',
+      expert: 'Expert',
+      expertDescription: 'CPU sempre pressiona seu melhor status.',
+      loadingDecks: 'Montando baralhos...',
+      start: 'Iniciar partida',
+      setupError: 'Não foi possível montar o baralho agora.',
+      round: 'Rodada',
+      dispute: 'Disputa acumulada: próxima vitória leva {count} cartas.',
+      matchWinner: '{winner} venceu a partida',
+      newMatch: 'Nova partida',
+      playerWon: 'Você venceu',
+      cpuWon: 'CPU venceu',
+      nextRound: 'Próxima rodada',
+      potDraw: 'As {count} cartas foram para a pilha de disputa.',
+      chooseAttribute: 'Escolha o atributo',
+      cpuHidden: 'A CPU está com a carta fechada. O atributo escolhido define quem leva as duas cartas.',
+      cpuSuggestion: 'CPU jogaria forte em {attribute}.',
+      cpuCard: 'Carta da CPU',
+      hiddenCard: 'Carta oculta',
+      revealHint: 'Escolha um atributo para revelar o duelo.',
+      legendaryRule: 'vence empate uma vez',
+      history: 'Histórico',
+      historyEmpty: 'Nenhuma rodada disputada ainda.',
+      potCards: '{count} cartas em disputa',
+      rarityCommon: 'Comum',
+      rarityRare: 'Rara',
+      rarityEpic: 'Épica',
+      rarityLegendary: 'Lendária'
+    },
+    attributes: {
+      hp: 'HP',
+      attack: 'Ataque',
+      defense: 'Defesa',
+      specialAttack: 'Ataque especial',
+      specialDefense: 'Defesa especial',
+      speed: 'Velocidade',
+      weight: 'Peso',
+      height: 'Altura',
+      total: 'Total de status',
+      shortAttack: 'ATQ',
+      shortDefense: 'DEF',
+      shortSpecialAttack: 'ATQ ESP',
+      shortSpecialDefense: 'DEF ESP',
+      shortSpeed: 'VEL',
+      shortWeight: 'PESO',
+      shortHeight: 'ALT'
+    },
+    types: {
+      normal: 'Normal',
+      fire: 'Fogo',
+      water: 'Água',
+      grass: 'Grama',
+      electric: 'Elétrico',
+      ice: 'Gelo',
+      fighting: 'Lutador',
+      poison: 'Venenoso',
+      ground: 'Terra',
+      flying: 'Voador',
+      psychic: 'Psíquico',
+      bug: 'Inseto',
+      rock: 'Pedra',
+      ghost: 'Fantasma',
+      dragon: 'Dragão',
+      dark: 'Sombrio',
+      steel: 'Aço',
+      fairy: 'Fada'
+    },
+    errors: {
+      loadPokedex: 'Não foi possível carregar a Pokédex. Confirme se o backend Java está rodando na porta 8080.',
+      notFound: 'Pokémon não encontrado. Tente nome ou ID, por exemplo: pikachu ou 25.'
+    }
+  },
+  es: {
+    common: { clear: 'Limpiar', all: 'Todos', you: 'Tú', cpu: 'CPU', draw: 'Empate' },
+    nav: { explore: 'Explorar', favorites: 'Favoritos', compare: 'Comparar', trunfo: 'Trunfo' },
+    language: { label: 'Idioma', changeTo: 'Cambiar idioma a' },
+    hero: {
+      brand: 'Pokédex Lab',
+      eyebrow: 'Consola premium con backend propio',
+      title: 'Explora Pokémon como si estuvieras en un laboratorio de batalla.',
+      description: 'Interfaz responsive, favoritos locales, comparación de estadísticas, dossier detallado e imágenes servidas solo por el backend Java con caché persistente en Docker.',
+      trunfoEyebrow: 'Modo competitivo de cartas',
+      trunfoTitle: 'Super Trunfo Pokémon',
+      trunfoDescription: 'Arma un mazo con datos reales de la Pokédex, elige atributos con estrategia y compite carta por carta contra la CPU.'
+    },
+    search: { placeholder: 'Busca por nombre o número: pikachu, charizard, 25...', submit: 'Buscar', quickTypes: 'Tipos rápidos', allTypes: 'Todos' },
+    pokedex: {
+      eyebrow: 'Discovery Grid',
+      title: 'Pokémon encontrados',
+      records: 'registros',
+      emptyTitle: 'No se encontró ningún Pokémon',
+      emptyDescription: 'Ajusta la búsqueda, limpia el filtro o elige otro tipo para ver nuevos resultados.',
+      previous: 'Anterior',
+      next: 'Siguiente',
+      page: 'Página',
+      of: 'de'
+    },
+    card: { openDetails: 'Abrir detalles de', favorite: 'Marcar favorito', compare: 'Comparar', inspect: 'Ver dossier' },
+    detail: {
+      close: 'Cerrar detalles',
+      loading: 'Cargando dossier Pokémon...',
+      fallbackGenus: 'Pokémon',
+      noDescription: 'No hay descripción disponible para esta especie.',
+      progress: 'Cargando atributos, habilidades y línea evolutiva...',
+      height: 'Altura',
+      weight: 'Peso',
+      generation: 'Generación',
+      habitat: 'Hábitat',
+      stats: 'Estadísticas base',
+      abilities: 'Habilidades',
+      gallery: 'Galería',
+      evolution: 'Línea evolutiva',
+      noEvolution: 'Sin cadena evolutiva disponible'
+    },
+    favorites: {
+      eyebrow: 'Colección local',
+      title: 'Favoritos',
+      emptyTitle: 'Aún no hay favoritos',
+      emptyDescription: 'Marca tus Pokémon preferidos en el corazón de las tarjetas para crear tu colección local.',
+      clear: 'Limpiar favoritos'
+    },
+    compare: {
+      title: 'Comparador de Pokémon',
+      emptyDescription: 'Selecciona dos Pokémon con el botón "+" en las tarjetas. La comparación destaca el ganador en cada atributo.',
+      loading: 'Preparando comparación...',
+      eyebrow: 'Battle Lab',
+      description: 'Comparación técnica por estadísticas base, tipo, altura y peso.'
+    },
+    trunfo: {
+      setupEyebrow: 'Super Trunfo Pokémon',
+      setupTitle: 'Arma tu mazo y vence a la CPU carta por carta.',
+      setupDescription: 'Una partida rápida con 20 cartas por lado, atributos reales de la Pokédex y rareza calculada por el total de estadísticas.',
+      deck: 'Mazo',
+      modeAll: 'Todos',
+      modeFavorites: 'Favoritos',
+      modeType: 'Por tipo',
+      favoriteRequirement: 'Usa al menos 40 favoritos para una partida completa.',
+      difficulty: 'Dificultad',
+      balanced: 'Equilibrado',
+      balancedDescription: 'La CPU elige entre buenos atributos.',
+      casual: 'Casual',
+      casualDescription: 'La CPU juega de forma impredecible.',
+      expert: 'Experto',
+      expertDescription: 'La CPU siempre presiona su mejor estadística.',
+      loadingDecks: 'Armando mazos...',
+      start: 'Iniciar partida',
+      setupError: 'No fue posible armar el mazo ahora.',
+      round: 'Ronda',
+      dispute: 'Disputa acumulada: la próxima victoria gana {count} cartas.',
+      matchWinner: '{winner} ganó la partida',
+      newMatch: 'Nueva partida',
+      playerWon: 'Ganaste',
+      cpuWon: 'La CPU ganó',
+      nextRound: 'Siguiente ronda',
+      potDraw: 'Las {count} cartas fueron a la pila de disputa.',
+      chooseAttribute: 'Elige el atributo',
+      cpuHidden: 'La CPU tiene la carta oculta. El atributo elegido define quién gana las dos cartas.',
+      cpuSuggestion: 'La CPU jugaría fuerte en {attribute}.',
+      cpuCard: 'Carta de la CPU',
+      hiddenCard: 'Carta oculta',
+      revealHint: 'Elige un atributo para revelar el duelo.',
+      legendaryRule: 'gana un empate una vez',
+      history: 'Historial',
+      historyEmpty: 'Aún no se disputó ninguna ronda.',
+      potCards: '{count} cartas en disputa',
+      rarityCommon: 'Común',
+      rarityRare: 'Rara',
+      rarityEpic: 'Épica',
+      rarityLegendary: 'Legendaria'
+    },
+    attributes: {
+      hp: 'HP',
+      attack: 'Ataque',
+      defense: 'Defensa',
+      specialAttack: 'Ataque especial',
+      specialDefense: 'Defensa especial',
+      speed: 'Velocidad',
+      weight: 'Peso',
+      height: 'Altura',
+      total: 'Total de estadísticas',
+      shortAttack: 'ATQ',
+      shortDefense: 'DEF',
+      shortSpecialAttack: 'ATQ ESP',
+      shortSpecialDefense: 'DEF ESP',
+      shortSpeed: 'VEL',
+      shortWeight: 'PESO',
+      shortHeight: 'ALT'
+    },
+    types: {
+      normal: 'Normal',
+      fire: 'Fuego',
+      water: 'Agua',
+      grass: 'Planta',
+      electric: 'Eléctrico',
+      ice: 'Hielo',
+      fighting: 'Lucha',
+      poison: 'Veneno',
+      ground: 'Tierra',
+      flying: 'Volador',
+      psychic: 'Psíquico',
+      bug: 'Bicho',
+      rock: 'Roca',
+      ghost: 'Fantasma',
+      dragon: 'Dragón',
+      dark: 'Siniestro',
+      steel: 'Acero',
+      fairy: 'Hada'
+    },
+    errors: {
+      loadPokedex: 'No fue posible cargar la Pokédex. Confirma que el backend Java esté ejecutándose en el puerto 8080.',
+      notFound: 'Pokémon no encontrado. Prueba con nombre o ID, por ejemplo: pikachu o 25.'
+    }
+  },
+  en: {
+    common: { clear: 'Clear', all: 'All', you: 'You', cpu: 'CPU', draw: 'Draw' },
+    nav: { explore: 'Explore', favorites: 'Favorites', compare: 'Compare', trunfo: 'Trunfo' },
+    language: { label: 'Language', changeTo: 'Change language to' },
+    hero: {
+      brand: 'Pokédex Lab',
+      eyebrow: 'Premium console with its own backend',
+      title: 'Explore Pokémon as if you were inside a battle lab.',
+      description: 'Responsive interface, local favorites, stat comparison, detailed dossiers and images served only by the Java backend with persistent Docker cache.',
+      trunfoEyebrow: 'Competitive card mode',
+      trunfoTitle: 'Pokémon Super Trunfo',
+      trunfoDescription: 'Build a deck with real Pokédex data, choose attributes strategically and battle the CPU card by card.'
+    },
+    search: { placeholder: 'Search by name or number: pikachu, charizard, 25...', submit: 'Search', quickTypes: 'Quick types', allTypes: 'All' },
+    pokedex: {
+      eyebrow: 'Discovery Grid',
+      title: 'Pokémon found',
+      records: 'records',
+      emptyTitle: 'No Pokémon found',
+      emptyDescription: 'Adjust the search, clear the filter or choose another type to see new results.',
+      previous: 'Previous',
+      next: 'Next',
+      page: 'Page',
+      of: 'of'
+    },
+    card: { openDetails: 'Open details for', favorite: 'Favorite', compare: 'Compare', inspect: 'View dossier' },
+    detail: {
+      close: 'Close details',
+      loading: 'Loading Pokémon dossier...',
+      fallbackGenus: 'Pokémon',
+      noDescription: 'No description available for this species.',
+      progress: 'Loading attributes, abilities and evolution line...',
+      height: 'Height',
+      weight: 'Weight',
+      generation: 'Generation',
+      habitat: 'Habitat',
+      stats: 'Base stats',
+      abilities: 'Abilities',
+      gallery: 'Gallery',
+      evolution: 'Evolution line',
+      noEvolution: 'No evolution chain available'
+    },
+    favorites: {
+      eyebrow: 'Local collection',
+      title: 'Favorites',
+      emptyTitle: 'No favorites yet',
+      emptyDescription: 'Mark your favorite Pokémon using the heart on the cards to build your local collection.',
+      clear: 'Clear favorites'
+    },
+    compare: {
+      title: 'Pokémon comparator',
+      emptyDescription: 'Select two Pokémon using the "+" button on the cards. The comparison highlights the winner for each attribute.',
+      loading: 'Preparing comparison...',
+      eyebrow: 'Battle Lab',
+      description: 'Technical comparison by base stats, type, height and weight.'
+    },
+    trunfo: {
+      setupEyebrow: 'Pokémon Super Trunfo',
+      setupTitle: 'Build your deck and beat the CPU card by card.',
+      setupDescription: 'A quick match with 20 cards on each side, real Pokédex attributes and rarity calculated by total stats.',
+      deck: 'Deck',
+      modeAll: 'All',
+      modeFavorites: 'Favorites',
+      modeType: 'By type',
+      favoriteRequirement: 'Use at least 40 favorites for a full match.',
+      difficulty: 'Difficulty',
+      balanced: 'Balanced',
+      balancedDescription: 'CPU chooses among strong attributes.',
+      casual: 'Casual',
+      casualDescription: 'CPU plays unpredictably.',
+      expert: 'Expert',
+      expertDescription: 'CPU always presses its best stat.',
+      loadingDecks: 'Building decks...',
+      start: 'Start match',
+      setupError: 'Could not build the deck right now.',
+      round: 'Round',
+      dispute: 'Accumulated dispute: next win takes {count} cards.',
+      matchWinner: '{winner} won the match',
+      newMatch: 'New match',
+      playerWon: 'You won',
+      cpuWon: 'CPU won',
+      nextRound: 'Next round',
+      potDraw: 'The {count} cards went to the dispute pile.',
+      chooseAttribute: 'Choose attribute',
+      cpuHidden: 'The CPU card is hidden. The chosen attribute decides who takes both cards.',
+      cpuSuggestion: 'CPU would play strong on {attribute}.',
+      cpuCard: 'CPU card',
+      hiddenCard: 'Hidden card',
+      revealHint: 'Choose an attribute to reveal the duel.',
+      legendaryRule: 'wins one draw once',
+      history: 'History',
+      historyEmpty: 'No rounds played yet.',
+      potCards: '{count} cards in dispute',
+      rarityCommon: 'Common',
+      rarityRare: 'Rare',
+      rarityEpic: 'Epic',
+      rarityLegendary: 'Legendary'
+    },
+    attributes: {
+      hp: 'HP',
+      attack: 'Attack',
+      defense: 'Defense',
+      specialAttack: 'Special attack',
+      specialDefense: 'Special defense',
+      speed: 'Speed',
+      weight: 'Weight',
+      height: 'Height',
+      total: 'Total stats',
+      shortAttack: 'ATK',
+      shortDefense: 'DEF',
+      shortSpecialAttack: 'SP ATK',
+      shortSpecialDefense: 'SP DEF',
+      shortSpeed: 'SPD',
+      shortWeight: 'WEIGHT',
+      shortHeight: 'HEIGHT'
+    },
+    types: {
+      normal: 'Normal',
+      fire: 'Fire',
+      water: 'Water',
+      grass: 'Grass',
+      electric: 'Electric',
+      ice: 'Ice',
+      fighting: 'Fighting',
+      poison: 'Poison',
+      ground: 'Ground',
+      flying: 'Flying',
+      psychic: 'Psychic',
+      bug: 'Bug',
+      rock: 'Rock',
+      ghost: 'Ghost',
+      dragon: 'Dragon',
+      dark: 'Dark',
+      steel: 'Steel',
+      fairy: 'Fairy'
+    },
+    errors: {
+      loadPokedex: 'Could not load the Pokédex. Confirm that the Java backend is running on port 8080.',
+      notFound: 'Pokémon not found. Try a name or ID, for example: pikachu or 25.'
+    }
+  }
+} as const;
+
+type WidenStrings<T> = T extends string
+  ? string
+  : T extends object
+    ? { [K in keyof T]: WidenStrings<T[K]> }
+    : T;
+
+export type Messages = WidenStrings<typeof messages.ptBR>;
+
+export function getMessages(language: AppLanguage) {
+  if (language === 'es') return messages.es;
+  if (language === 'en') return messages.en;
+  return messages.ptBR;
+}
+
+export function interpolate(template: string, values: Record<string, string | number>) {
+  return Object.entries(values).reduce(
+    (text, [key, value]) => text.replaceAll(`{${key}}`, String(value)),
+    template
+  );
+}

@@ -7,8 +7,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.reactive.resource.NoResourceFoundException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
@@ -33,6 +35,24 @@ public class GlobalExceptionHandler {
     public Mono<ResponseEntity<ApiError>> handleDatabase(DataAccessException exception, ServerWebExchange exchange) {
         log.error("database error path={}", exchange.getRequest().getPath(), exception);
         return error(HttpStatus.SERVICE_UNAVAILABLE, "Banco de dados temporariamente indisponível.", exchange);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public Mono<ResponseEntity<ApiError>> handleNoResource(NoResourceFoundException exception, ServerWebExchange exchange) {
+        log.warn("resource not found path={}", exchange.getRequest().getPath());
+        return error(HttpStatus.NOT_FOUND, "Recurso nao encontrado.", exchange);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public Mono<ResponseEntity<ApiError>> handleIllegalArgument(IllegalArgumentException exception, ServerWebExchange exchange) {
+        log.warn("invalid request path={} message={}", exchange.getRequest().getPath(), exception.getMessage());
+        return error(HttpStatus.BAD_REQUEST, exception.getMessage(), exchange);
+    }
+
+    @ExceptionHandler(ServerWebInputException.class)
+    public Mono<ResponseEntity<ApiError>> handleInvalidInput(ServerWebInputException exception, ServerWebExchange exchange) {
+        log.warn("invalid request body path={} message={}", exchange.getRequest().getPath(), exception.getMessage());
+        return error(HttpStatus.BAD_REQUEST, "Corpo da requisicao invalido.", exchange);
     }
 
     @ExceptionHandler(Exception.class)
