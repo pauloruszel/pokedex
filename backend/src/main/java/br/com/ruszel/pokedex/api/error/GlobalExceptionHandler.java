@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.reactive.resource.NoResourceFoundException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -33,6 +34,12 @@ public class GlobalExceptionHandler {
     public Mono<ResponseEntity<ApiError>> handleDatabase(DataAccessException exception, ServerWebExchange exchange) {
         log.error("database error path={}", exchange.getRequest().getPath(), exception);
         return error(HttpStatus.SERVICE_UNAVAILABLE, "Banco de dados temporariamente indisponível.", exchange);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public Mono<ResponseEntity<ApiError>> handleNoResource(NoResourceFoundException exception, ServerWebExchange exchange) {
+        log.warn("resource not found path={}", exchange.getRequest().getPath());
+        return error(HttpStatus.NOT_FOUND, "Recurso nao encontrado.", exchange);
     }
 
     @ExceptionHandler(Exception.class)
