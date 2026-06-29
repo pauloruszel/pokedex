@@ -34,6 +34,7 @@ export type RoundHistoryItem = {
   playerValue: number;
   cpuValue: number;
   result: RoundResult;
+  potSize: number;
 };
 
 export type TrunfoSetup = {

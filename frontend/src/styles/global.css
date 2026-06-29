@@ -437,9 +437,19 @@ h2 { margin: 0; color: #fff; letter-spacing: -0.05em; }
   font-weight: 950;
   white-space: nowrap;
 }
-.trunfo-table { display: grid; grid-template-columns: minmax(250px, 1fr) 220px minmax(250px, 1fr); gap: 16px; align-items: center; }
+.trunfo-dispute-banner {
+  margin: -4px 0 14px;
+  border: 1px solid rgba(255, 214, 110, .34);
+  border-radius: 16px;
+  color: #ffe6a6;
+  background: rgba(255, 214, 110, .10);
+  padding: 11px 14px;
+  font-weight: 900;
+  text-align: center;
+}
+.trunfo-table { display: grid; grid-template-columns: minmax(230px, 1fr) 200px minmax(230px, 1fr); gap: 14px; align-items: center; }
 .trunfo-vs-panel {
-  min-height: 260px;
+  min-height: 230px;
   display: grid;
   align-content: center;
   justify-items: center;
@@ -460,13 +470,14 @@ h2 { margin: 0; color: #fff; letter-spacing: -0.05em; }
 .trunfo-card {
   position: relative;
   overflow: hidden;
-  min-height: 560px;
+  min-height: 510px;
   border: 1px solid rgba(255,255,255,.16);
   border-radius: 28px;
   padding: 16px;
   background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04));
   box-shadow: 0 20px 60px rgba(0,0,0,.26);
   isolation: isolate;
+  transform-origin: center;
 }
 .trunfo-card::before {
   content: "";
@@ -495,21 +506,21 @@ h2 { margin: 0; color: #fff; letter-spacing: -0.05em; }
 }
 .trunfo-card-header { justify-content: space-between; gap: 12px; color: rgba(255,255,255,.72); font-weight: 950; }
 .trunfo-card-header strong { display: flex; align-items: center; gap: 6px; color: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 7px 10px; background: rgba(255,255,255,.09); }
-.trunfo-card-image { position: relative; height: 192px; display: grid; place-items: end center; }
-.trunfo-card-image img { width: 184px; height: 184px; object-fit: contain; filter: drop-shadow(0 24px 18px rgba(0,0,0,.30)); }
+.trunfo-card-image { position: relative; height: 156px; display: grid; place-items: end center; }
+.trunfo-card-image img { width: 152px; height: 152px; object-fit: contain; filter: drop-shadow(0 24px 18px rgba(0,0,0,.30)); }
 .trunfo-crown { position: absolute; top: 12px; right: calc(50% - 92px); color: #ffd66e; filter: drop-shadow(0 0 12px rgba(255,214,110,.42)); }
-.trunfo-card-title { flex-direction: column; gap: 10px; text-align: center; margin-bottom: 14px; }
-.trunfo-card-title h3 { margin: 0; color: #fff; font-size: 1.65rem; letter-spacing: -0.04em; }
-.trunfo-attribute-list { display: grid; gap: 8px; }
+.trunfo-card-title { flex-direction: column; gap: 8px; text-align: center; margin-bottom: 12px; }
+.trunfo-card-title h3 { margin: 0; color: #fff; font-size: 1.45rem; letter-spacing: -0.04em; }
+.trunfo-attribute-list { display: grid; gap: 7px; }
 .trunfo-attribute-row {
   justify-content: space-between;
   gap: 10px;
-  min-height: 38px;
+  min-height: 34px;
   border: 1px solid rgba(255,255,255,.10);
   border-radius: 13px;
   color: var(--text-soft);
   background: rgba(255,255,255,.06);
-  padding: 8px 10px;
+  padding: 7px 10px;
 }
 .trunfo-attribute-row span { font-size: .76rem; font-weight: 950; }
 .trunfo-attribute-row strong { color: #fff; }
@@ -539,6 +550,12 @@ h2 { margin: 0; color: #fff; letter-spacing: -0.05em; }
 }
 .trunfo-card--back strong { color: #fff; font-size: 1.35rem; }
 .trunfo-card--back span { color: var(--text-soft); font-weight: 800; }
+.trunfo-card--face-up { animation: trunfoFlipIn .34s ease both; }
+.trunfo-card--round-winner {
+  border-color: rgba(110,231,255,.70);
+  box-shadow: 0 0 0 1px rgba(110,231,255,.24), 0 28px 82px rgba(110,231,255,.18);
+  animation: trunfoWinnerPulse .55s ease both;
+}
 
 .trunfo-attribute-picker {
   display: grid;
@@ -577,12 +594,29 @@ h2 { margin: 0; color: #fff; letter-spacing: -0.05em; }
 .trunfo-history-item span { color: var(--text-muted); font-size: .78rem; font-weight: 900; }
 .trunfo-history-item strong { color: #fff; }
 .trunfo-history-item small { color: var(--text-soft); line-height: 1.45; }
+.trunfo-history-item em { color: #ffe6a6; font-size: .78rem; font-style: normal; font-weight: 900; }
 .trunfo-history-item--player { border-color: rgba(110,231,255,.34); }
 .trunfo-history-item--cpu { border-color: rgba(255,123,145,.34); }
 .trunfo-history-item--draw { border-color: rgba(255,214,110,.34); }
 
 @keyframes fadeIn { from { opacity: 0; } }
 @keyframes slideIn { from { transform: translateX(36px); opacity: .6; } }
+@keyframes trunfoFlipIn {
+  from { opacity: .55; transform: rotateY(-18deg) scale(.98); }
+  to { opacity: 1; transform: rotateY(0) scale(1); }
+}
+@keyframes trunfoWinnerPulse {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.025); }
+  100% { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trunfo-card--face-up,
+  .trunfo-card--round-winner {
+    animation: none;
+  }
+}
 
 @media (max-width: 900px) {
   .app-shell { width: min(100% - 22px, 1260px); padding-top: 14px; }
@@ -630,6 +664,6 @@ h2 { margin: 0; color: #fff; letter-spacing: -0.05em; }
   .trunfo-setup { padding: 12px; }
   .trunfo-setup-copy, .trunfo-setup-panel, .trunfo-battle, .trunfo-history { border-radius: 20px; }
   .trunfo-difficulty-grid, .trunfo-segmented { grid-template-columns: 1fr; }
-  .trunfo-card { min-height: 520px; border-radius: 24px; }
+  .trunfo-card { min-height: 500px; border-radius: 24px; }
   .trunfo-attribute-picker { grid-template-columns: repeat(2, 1fr); }
 }

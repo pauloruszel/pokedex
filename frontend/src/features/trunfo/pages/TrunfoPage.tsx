@@ -65,6 +65,7 @@ export function TrunfoPage({ favorites, types, getCandidates, loadDetail }: Prop
             round={game.round}
             playerDeckCount={game.playerDeck.length}
             cpuDeckCount={game.cpuDeck.length}
+            disputePileCount={game.disputePile.length}
             playerCard={game.playerCard}
             cpuCard={game.cpuCard}
             selectedAttribute={game.selectedAttribute}

@@ -25,6 +25,7 @@ export function useTrunfoGame() {
   const [status, setStatus] = useState<GameStatus>('setup');
   const [playerDeck, setPlayerDeck] = useState<TrunfoCardModel[]>([]);
   const [cpuDeck, setCpuDeck] = useState<TrunfoCardModel[]>([]);
+  const [disputePile, setDisputePile] = useState<TrunfoCardModel[]>([]);
   const [history, setHistory] = useState<RoundHistoryItem[]>([]);
   const [selectedAttribute, setSelectedAttribute] = useState<TrunfoAttributeKey | null>(null);
   const [roundResult, setRoundResult] = useState<RoundHistoryItem | null>(null);
@@ -36,6 +37,7 @@ export function useTrunfoGame() {
   const round = history.length + 1;
 
   const winner = useMemo(() => {
+    if (playerDeck.length === 0 && cpuDeck.length === 0) return 'Empate';
     if (playerDeck.length === 0 && cpuDeck.length > 0) return 'CPU';
     if (cpuDeck.length === 0 && playerDeck.length > 0) return 'Você';
     return null;
@@ -45,6 +47,7 @@ export function useTrunfoGame() {
     setStatus('loading');
     setError(null);
     setHistory([]);
+    setDisputePile([]);
     setRoundResult(null);
     setSelectedAttribute(null);
     setDifficulty(nextDifficulty);
@@ -81,7 +84,8 @@ export function useTrunfoGame() {
       cpuName: cpuCard.summary.name,
       playerValue: playerCard.attributes[attribute],
       cpuValue: cpuCard.attributes[attribute],
-      result
+      result,
+      potSize: disputePile.length + 2
     };
 
     setSelectedAttribute(attribute);
@@ -97,23 +101,31 @@ export function useTrunfoGame() {
 
     const playerRest = playerDeck.slice(1);
     const cpuRest = cpuDeck.slice(1);
+    const stake = [...disputePile, playerCard, cpuCard];
 
     if (roundResult.result === 'player') {
-      setPlayerDeck([...playerRest, playerCard, cpuCard]);
+      setPlayerDeck([...playerRest, ...stake]);
       setCpuDeck(cpuRest);
+      setDisputePile([]);
     } else if (roundResult.result === 'cpu') {
       setPlayerDeck(playerRest);
-      setCpuDeck([...cpuRest, cpuCard, playerCard]);
+      setCpuDeck([...cpuRest, ...stake]);
+      setDisputePile([]);
     } else {
-      setPlayerDeck([...playerRest, playerCard]);
-      setCpuDeck([...cpuRest, cpuCard]);
+      setPlayerDeck(playerRest);
+      setCpuDeck(cpuRest);
+      setDisputePile(stake);
     }
 
     setSelectedAttribute(null);
     setRoundResult(null);
 
-    const nextPlayerCount = roundResult.result === 'cpu' ? playerRest.length : playerRest.length + 1;
-    const nextCpuCount = roundResult.result === 'player' ? cpuRest.length : cpuRest.length + 1;
+    const nextPlayerCount = roundResult.result === 'player'
+      ? playerRest.length + stake.length
+      : playerRest.length;
+    const nextCpuCount = roundResult.result === 'cpu'
+      ? cpuRest.length + stake.length
+      : cpuRest.length;
     setStatus(nextPlayerCount === 0 || nextCpuCount === 0 ? 'finished' : 'ready');
   }
 
@@ -125,6 +137,7 @@ export function useTrunfoGame() {
     setStatus('setup');
     setPlayerDeck([]);
     setCpuDeck([]);
+    setDisputePile([]);
     setHistory([]);
     setSelectedAttribute(null);
     setRoundResult(null);
@@ -135,6 +148,7 @@ export function useTrunfoGame() {
     status,
     playerDeck,
     cpuDeck,
+    disputePile,
     playerCard,
     cpuCard,
     history,

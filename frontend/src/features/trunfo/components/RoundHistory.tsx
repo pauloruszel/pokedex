@@ -27,6 +27,7 @@ export function RoundHistory({ history }: Props) {
                 {getAttributeLabel(item.attribute)}: {formatPokemonName(item.playerName)} {formatAttributeValue(item.attribute, item.playerValue)}
                 {' '}x {formatAttributeValue(item.attribute, item.cpuValue)} {formatPokemonName(item.cpuName)}
               </small>
+              {item.potSize > 2 && <em>{item.potSize} cartas em disputa</em>}
             </article>
           ))}
         </div>

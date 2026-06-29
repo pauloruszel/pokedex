@@ -9,6 +9,7 @@ type Props = {
   round: number;
   playerDeckCount: number;
   cpuDeckCount: number;
+  disputePileCount: number;
   playerCard: TrunfoCardModel | null;
   cpuCard: TrunfoCardModel | null;
   selectedAttribute: TrunfoAttributeKey | null;
@@ -25,6 +26,7 @@ export function BattlePanel({
   round,
   playerDeckCount,
   cpuDeckCount,
+  disputePileCount,
   playerCard,
   cpuCard,
   selectedAttribute,
@@ -52,6 +54,12 @@ export function BattlePanel({
         </div>
       </header>
 
+      {disputePileCount > 0 && (
+        <div className="trunfo-dispute-banner">
+          Disputa acumulada: próxima vitória leva {disputePileCount + 2} cartas.
+        </div>
+      )}
+
       <div className="trunfo-table">
         <TrunfoCard
           card={playerCard}
@@ -78,6 +86,9 @@ export function BattlePanel({
                 {' '}x{' '}
                 {formatAttributeValue(roundResult.attribute, roundResult.cpuValue)} {formatPokemonName(roundResult.cpuName)}
               </p>
+              {roundResult.result === 'draw' && (
+                <small>As {roundResult.potSize} cartas foram para a pilha de disputa.</small>
+              )}
               <button className="primary-control" onClick={onNext}>Próxima rodada <ArrowRight size={17} /></button>
             </>
           ) : (

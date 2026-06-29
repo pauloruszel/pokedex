@@ -18,7 +18,7 @@ type Props = {
 export function TrunfoCard({ card, side, isHidden = false, selectedAttribute, winningAttribute }: Props) {
   if (!card || isHidden) {
     return (
-      <article className="trunfo-card trunfo-card--back">
+      <article className="trunfo-card trunfo-card--back trunfo-card--face-down">
         <div className="trunfo-card-back-symbol">
           <ShieldQuestion size={42} />
         </div>
@@ -29,10 +29,12 @@ export function TrunfoCard({ card, side, isHidden = false, selectedAttribute, wi
   }
 
   const theme = getTypeTheme(card.summary.types);
+  const stateClass = side === 'cpu' && selectedAttribute ? 'trunfo-card--face-up' : '';
+  const winnerClass = winningAttribute ? 'trunfo-card--round-winner' : '';
 
   return (
     <article
-      className={`trunfo-card trunfo-card--${card.rarity}`}
+      className={['trunfo-card', `trunfo-card--${card.rarity}`, stateClass, winnerClass].filter(Boolean).join(' ')}
       style={{ '--card-gradient': theme.gradient, '--type-accent': theme.accent } as CSSProperties}
     >
       <header className="trunfo-card-header">
