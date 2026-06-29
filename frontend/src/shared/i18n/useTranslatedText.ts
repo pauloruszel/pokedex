@@ -8,12 +8,12 @@ export function useTranslatedText(text: string | null | undefined, kind: string)
   const { language } = useI18n();
   const sourceText = text?.trim() ?? '';
   const cacheKey = useMemo(() => `${language}|${kind}|${sourceText}`, [language, kind, sourceText]);
-  const [translated, setTranslated] = useState(sourceText);
+  const [translated, setTranslated] = useState(language === 'pt-BR' ? sourceText : '');
   const [isTranslating, setIsTranslating] = useState(false);
 
   useEffect(() => {
     if (!sourceText || language === 'pt-BR') {
-      setTranslated(sourceText);
+      setTranslated(language === 'pt-BR' ? sourceText : '');
       setIsTranslating(false);
       return;
     }
@@ -26,6 +26,7 @@ export function useTranslatedText(text: string | null | undefined, kind: string)
     }
 
     const controller = new AbortController();
+    setTranslated('');
     setIsTranslating(true);
     translateText({
       text: sourceText,
@@ -35,10 +36,12 @@ export function useTranslatedText(text: string | null | undefined, kind: string)
       signal: controller.signal
     })
       .then((result) => {
-        memoryCache.set(cacheKey, result.text);
+        if (result.text) {
+          memoryCache.set(cacheKey, result.text);
+        }
         setTranslated(result.text);
       })
-      .catch(() => setTranslated(sourceText))
+      .catch(() => setTranslated(''))
       .finally(() => setIsTranslating(false));
 
     return () => controller.abort();

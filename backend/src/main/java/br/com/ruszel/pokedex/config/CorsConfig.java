@@ -22,7 +22,7 @@ public class CorsConfig {
                 "http://localhost:5174",
                 "http://127.0.0.1:5174"
         ));
-        configuration.setAllowedMethods(List.of("GET", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
 
         var source = new UrlBasedCorsConfigurationSource();
