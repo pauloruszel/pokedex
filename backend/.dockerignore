@@ -1,0 +1,7 @@
+target/
+data/
+*.log
+*.out.log
+*.err.log
+.git/
+.idea/

@@ -1,12 +1,11 @@
 FROM eclipse-temurin:17-jdk AS build
 WORKDIR /app
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends maven \
-    && rm -rf /var/lib/apt/lists/*
-COPY pom.xml .
-RUN mvn -q -DskipTests dependency:go-offline
+COPY .mvn ./.mvn
+COPY mvnw pom.xml ./
+RUN chmod +x mvnw
+RUN ./mvnw -q -DskipTests dependency:go-offline
 COPY src ./src
-RUN mvn -q -DskipTests package
+RUN ./mvnw -q -DskipTests package
 
 FROM eclipse-temurin:17-jre
 WORKDIR /app
