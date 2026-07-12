@@ -2,6 +2,10 @@
 
 Use esta spec para definir quando uma tarefa está pronta.
 
+## Regra base
+
+Rode o menor comando confiável para o escopo alterado. Não execute validações caras sem relação com a mudança; registre o motivo no fechamento.
+
 ## Frontend
 
 ```powershell
@@ -38,10 +42,9 @@ Use para:
 
 ```powershell
 docker compose config
-docker compose up --build
 ```
 
-Use `up --build` quando a alteração afetar Dockerfile, Compose, Nginx, portas ou variáveis de runtime.
+Use `docker compose config` para validar Compose. Use `docker compose up --build` só quando a alteração afetar Dockerfile, Nginx, portas, variáveis de runtime ou build da imagem.
 
 ## Graphify
 
@@ -56,4 +59,3 @@ Use quando a alteração tiver objetivo arquitetural.
 ## Regra
 
 Se um comando não puder ser executado, registrar o motivo no fechamento da tarefa.
-

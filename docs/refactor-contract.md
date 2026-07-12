@@ -19,6 +19,8 @@ Use esta spec quando a tarefa pedir refatoração.
 7. Validar com o menor comando confiável.
 8. Fechar a tarefa com arquivos alterados, validação e pendências explícitas.
 
+Se a tarefa pedir apenas diagnóstico ou plano, parar antes da implementação.
+
 ## Se usar Graphify
 
 - Registrar baseline antes de editar: commit, comunidade, coesão e god nodes.
@@ -31,7 +33,8 @@ Use esta spec quando a tarefa pedir refatoração.
 
 ## Saída esperada
 
-- Código alterado.
+- Diagnóstico e decisão final quando não houver implementação.
+- Código alterado, quando houver implementação.
 - Arquivos tocados.
 - Validação executada.
 - Comandos não executados e motivo.

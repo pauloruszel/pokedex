@@ -65,16 +65,16 @@ Restrições:
 - Use Ponytail: menor corte que melhora a estrutura.
 - Confirme no código se as relações inferidas pelo Graphify são reais.
 - Não crie abstração com uma única implementação sem necessidade.
+- Use baseline curta; não carregue o GRAPH_REPORT.md inteiro.
 
 Validação:
-- cd frontend && npm run build
-- cd backend && .\mvnw.cmd test
-- graphify . --update
+- Rodar só os comandos relevantes ao escopo alterado.
+- Se alterar código por causa do Graphify, rodar update, cluster e label.
 
 Entrega:
 - Aplique a refatoração.
 - Explique qual acoplamento foi removido.
-- Informe se a métrica do Graphify melhorou.
+- Informe a decisão final e, se rodar Graphify, compare antes/depois.
 ```
 
 ## Bug ou comportamento quebrado
@@ -273,4 +273,3 @@ Use o endpoint existente com offset, adicione busca por nome/número e botão ca
 Não altere o modo automático.
 Valide com npm run build no frontend.
 ```
-
