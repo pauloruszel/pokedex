@@ -30,8 +30,8 @@ public class PokemonSpeciesTranslator {
             return null;
         }
 
-        TranslateTextUseCase.TranslationResult result = translateTextUseCase.execute(
-                new TranslateTextUseCase.TranslationRequest(
+        TranslationResult result = translateTextUseCase.execute(
+                new TranslationRequest(
                         text,
                         SOURCE_LOCALE,
                         targetLocale,

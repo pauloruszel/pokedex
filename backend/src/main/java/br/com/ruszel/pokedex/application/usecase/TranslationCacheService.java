@@ -96,8 +96,8 @@ public class TranslationCacheService {
                 .update();
     }
 
-    public CleanupResult cleanupInvalidCachedTranslations() {
-        int deleted = jdbcClient.sql("""
+    public int cleanupInvalidCachedTranslations() {
+        return jdbcClient.sql("""
                         DELETE FROM pokemon_text_translation
                          WHERE locale IN ('es', 'en')
                            AND (
@@ -106,8 +106,6 @@ public class TranslationCacheService {
                            )
                         """)
                 .update();
-
-        return new CleanupResult(deleted);
     }
 
     @Schema(description = "Tradução recuperada do cache.")
@@ -116,13 +114,6 @@ public class TranslationCacheService {
             String translatedText,
             @Schema(description = "Origem da tradução salva.", example = "external-provider")
             String translationSource
-    ) {
-    }
-
-    @Schema(description = "Resultado da limpeza de cache de traduções inválidas.")
-    public record CleanupResult(
-            @Schema(description = "Quantidade de registros removidos.", example = "12")
-            int deleted
     ) {
     }
 }
