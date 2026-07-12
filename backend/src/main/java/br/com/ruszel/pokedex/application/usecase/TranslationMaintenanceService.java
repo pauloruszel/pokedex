@@ -2,6 +2,7 @@ package br.com.ruszel.pokedex.application.usecase;
 
 import br.com.ruszel.pokedex.application.port.PokemonDetailRepository;
 import br.com.ruszel.pokedex.infrastructure.localization.SpeciesTextLocalizer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -96,13 +97,24 @@ public class TranslationMaintenanceService {
         return count > 0;
     }
 
-    public record MissingTranslation(int id, String name) {
+    @Schema(description = "Pokémon com tradução pt-BR pendente.")
+    public record MissingTranslation(
+            @Schema(description = "ID nacional do Pokémon.", example = "25")
+            int id,
+            @Schema(description = "Nome canônico do Pokémon.", example = "pikachu")
+            String name
+    ) {
     }
 
+    @Schema(description = "Resultado da manutenção de traduções.")
     public record RefreshResult(
+            @Schema(description = "Itens solicitados para processamento.")
             List<MissingTranslation> requested,
+            @Schema(description = "Itens atualizados com sucesso.")
             List<MissingTranslation> refreshed,
+            @Schema(description = "Itens que falharam durante o processamento.")
             List<MissingTranslation> failed,
+            @Schema(description = "Itens que continuam pendentes após a execução.")
             List<MissingTranslation> remaining
     ) {
     }
