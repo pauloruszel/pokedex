@@ -2,6 +2,7 @@ import type { TrunfoAttributeKey } from './trunfoCard';
 
 export type TrunfoDifficulty = 'casual' | 'balanced' | 'expert';
 export type TrunfoMode = 'all' | 'favorites' | 'type';
+export type TrunfoDeckSelection = 'auto' | 'manual';
 export type RoundResult = 'player' | 'cpu' | 'draw';
 export type GameStatus = 'setup' | 'loading' | 'ready' | 'revealed' | 'finished';
 
@@ -18,6 +19,7 @@ export type RoundHistoryItem = {
 
 export type TrunfoSetup = {
   mode: TrunfoMode;
+  deckSelection: TrunfoDeckSelection;
   type: string;
   difficulty: TrunfoDifficulty;
 };

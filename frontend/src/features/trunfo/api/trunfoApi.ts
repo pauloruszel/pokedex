@@ -13,10 +13,11 @@ async function request<T>(path: string): Promise<T> {
 }
 
 export const trunfoApi = {
-  cards: (limit = 40, mode: TrunfoDifficulty = 'balanced', type?: string) => {
+  cards: (limit = 40, mode: TrunfoDifficulty = 'balanced', type?: string, offset = 0) => {
     const params = new URLSearchParams({
       limit: String(limit),
-      mode
+      mode,
+      offset: String(offset)
     });
 
     if (type) {

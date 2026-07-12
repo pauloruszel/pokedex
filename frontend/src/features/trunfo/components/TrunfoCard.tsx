@@ -34,6 +34,9 @@ export function TrunfoCard({ card, side, isHidden = false, selectedAttribute, wi
   const theme = getTypeTheme(card.summary.types);
   const stateClass = side === 'cpu' && selectedAttribute ? 'trunfo-card--face-up' : '';
   const winnerClass = winningAttribute ? 'trunfo-card--round-winner' : '';
+  const bestAttribute = ATTRIBUTE_OPTIONS
+    .filter((option) => option.key !== 'total')
+    .sort((a, b) => card.attributes[b.key] - card.attributes[a.key])[0];
 
   return (
     <article
@@ -55,6 +58,12 @@ export function TrunfoCard({ card, side, isHidden = false, selectedAttribute, wi
         <div className="type-list">
           {card.summary.types.map((type) => <TypeBadge key={type} type={type} label={messages.types[type as keyof typeof messages.types]} compact />)}
         </div>
+      </div>
+
+      <div className="trunfo-card-power">
+        <span>{messages.trunfo.cardPower}</span>
+        <strong>{card.attributes.total}</strong>
+        {bestAttribute && <small>{messages.trunfo.bestAttribute}: {getAttributeShortLabel(bestAttribute.key, messages)}</small>}
       </div>
 
       <div className="trunfo-attribute-list">
