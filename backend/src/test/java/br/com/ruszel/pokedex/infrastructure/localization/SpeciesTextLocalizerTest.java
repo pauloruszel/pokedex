@@ -1,5 +1,6 @@
 package br.com.ruszel.pokedex.infrastructure.localization;
 
+import br.com.ruszel.pokedex.application.usecase.TranslationCacheService;
 import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +34,7 @@ class SpeciesTextLocalizerTest {
                 """);
         jdbcTemplate.execute("DELETE FROM pokemon_text_translation");
         localizer = new SpeciesTextLocalizer(
-                JdbcClient.create(dataSource),
+                new TranslationCacheService(JdbcClient.create(dataSource)),
                 new PtBrTranslationGateway() {
                     @Override
                     public Optional<String> translate(String sourceText) {

@@ -1,21 +1,22 @@
 import { useMemo, useState } from 'react';
-import { useI18n } from '../../../shared/i18n/I18nProvider';
+import { useMessages } from '../../../shared/i18n/I18nProvider';
 import type { PokemonDetail, PokemonSummary } from '../../pokemon/types/pokemon';
 import { BattlePanel } from '../components/BattlePanel';
 import { GameSetup } from '../components/GameSetup';
 import { RoundHistory } from '../components/RoundHistory';
+import { trunfoApi } from '../api/trunfoApi';
+import { createTrunfoCardFromApi } from '../api/trunfoMapper';
 import { useTrunfoGame } from '../hooks/useTrunfoGame';
-import type { TrunfoSetup } from '../types/trunfo';
+import type { TrunfoSetup } from '../types/trunfoGame';
 
 type Props = {
   favorites: PokemonSummary[];
   types: string[];
-  getCandidates: (setup: TrunfoSetup) => Promise<PokemonSummary[]>;
   loadDetail: (pokemon: PokemonSummary) => Promise<PokemonDetail>;
 };
 
-export function TrunfoPage({ favorites, types, getCandidates, loadDetail }: Props) {
-  const { messages } = useI18n();
+export function TrunfoPage({ favorites, types, loadDetail }: Props) {
+  const messages = useMessages();
   const [setup, setSetup] = useState<TrunfoSetup>({
     mode: 'all',
     type: types[0] ?? 'normal',
@@ -35,9 +36,12 @@ export function TrunfoPage({ favorites, types, getCandidates, loadDetail }: Prop
     setIsPreparing(true);
 
     try {
-      const nextCandidates = setup.mode === 'favorites' ? candidates : await getCandidates(setup);
+      const cards = setup.mode === 'favorites'
+        ? undefined
+        : (await trunfoApi.cards(40, setup.difficulty, setup.mode === 'type' ? setup.type : undefined)).map(createTrunfoCardFromApi);
       await game.startGame({
-        candidates: nextCandidates,
+        candidates,
+        cards,
         difficulty: setup.difficulty,
         loadDetail
       });

@@ -1,8 +1,9 @@
 import { ArrowRight, Bot, RotateCcw, Trophy, UserRound } from 'lucide-react';
-import { useI18n } from '../../../shared/i18n/I18nProvider';
+import { useI18nFormat, useMessages } from '../../../shared/i18n/I18nProvider';
 import { formatPokemonName } from '../../../shared/utils/format';
-import type { RoundHistoryItem, TrunfoAttributeKey, TrunfoCardModel } from '../types/trunfo';
-import { ATTRIBUTE_OPTIONS, formatAttributeValue, getAttributeLabel, getAttributeShortLabel } from '../utils/trunfoRules';
+import type { TrunfoAttributeKey, TrunfoCardModel } from '../types/trunfoCard';
+import type { RoundHistoryItem } from '../types/trunfoGame';
+import { ATTRIBUTE_OPTIONS, formatAttributeValue, getAttributeLabel, getAttributeShortLabel } from '../utils/trunfoAttributes';
 import { TrunfoCard } from './TrunfoCard';
 
 type Props = {
@@ -38,7 +39,8 @@ export function BattlePanel({
   onNext,
   onReset
 }: Props) {
-  const { messages, format } = useI18n();
+  const messages = useMessages();
+  const format = useI18nFormat();
   const isRevealed = status === 'revealed' || status === 'finished';
   const canPlay = status === 'ready';
   const winnerLabel = winner === 'Você' ? messages.common.you : winner === 'Empate' ? messages.common.draw : winner;

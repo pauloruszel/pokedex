@@ -1,7 +1,8 @@
 import { Swords, Trash2 } from 'lucide-react';
 import { StatBar } from '../../shared/components/StatBar';
 import { TypeBadge } from '../../shared/components/TypeBadge';
-import { useI18n } from '../../shared/i18n/I18nProvider';
+import { useMessages } from '../../shared/i18n/I18nProvider';
+import { statLabel } from '../../shared/i18n/labels';
 import { assetUrl } from '../../shared/utils/assets';
 import { formatPokemonName, formatPokemonNumber } from '../../shared/utils/format';
 import type { PokemonDetail, PokemonSummary } from '../pokemon/types/pokemon';
@@ -17,7 +18,7 @@ type Props = {
 const statOrder = ['hp', 'attack', 'defense', 'special-attack', 'special-defense', 'speed'];
 
 export function CompareView({ compareSelection, compareDetails, isLoading, onClear, onOpen }: Props) {
-  const { messages } = useI18n();
+  const messages = useMessages();
 
   if (compareSelection.length < 2) {
     return (
@@ -53,7 +54,7 @@ export function CompareView({ compareSelection, compareDetails, isLoading, onCle
             <img src={assetUrl(pokemon.imageUrl)} alt={pokemon.name} />
             <strong>{formatPokemonName(pokemon.name)}</strong>
             <div className="type-list">
-              {pokemon.types.map((type) => <TypeBadge type={type} compact key={type} />)}
+              {pokemon.types.map((type) => <TypeBadge type={type} label={messages.types[type as keyof typeof messages.types]} compact key={type} />)}
             </div>
           </button>
         ))}
@@ -76,26 +77,13 @@ export function CompareView({ compareSelection, compareDetails, isLoading, onCle
       <div className="detail-two-columns">
         <section className="detail-card-panel">
           <h3>{formatPokemonName(first.name)}</h3>
-          {first.stats.map((stat) => <StatBar key={stat.name} name={stat.name} value={stat.value} />)}
+          {first.stats.map((stat) => <StatBar key={stat.name} name={stat.name} value={stat.value} label={statLabel(stat.name, messages)} />)}
         </section>
         <section className="detail-card-panel">
           <h3>{formatPokemonName(second.name)}</h3>
-          {second.stats.map((stat) => <StatBar key={stat.name} name={stat.name} value={stat.value} />)}
+          {second.stats.map((stat) => <StatBar key={stat.name} name={stat.name} value={stat.value} label={statLabel(stat.name, messages)} />)}
         </section>
       </div>
     </section>
   );
-}
-
-function statLabel(name: string, messages: ReturnType<typeof useI18n>['messages']) {
-  const map: Record<string, string> = {
-    hp: messages.attributes.hp,
-    attack: messages.attributes.attack,
-    defense: messages.attributes.defense,
-    'special-attack': messages.attributes.specialAttack,
-    'special-defense': messages.attributes.specialDefense,
-    speed: messages.attributes.speed
-  };
-
-  return map[name] ?? name;
 }

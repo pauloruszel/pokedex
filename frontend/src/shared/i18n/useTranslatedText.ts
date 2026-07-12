@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { translateText } from './translationApi';
-import { useI18n } from './I18nProvider';
+import { useAppLanguage } from './I18nProvider';
 
 const memoryCache = new Map<string, string>();
 
 export function useTranslatedText(text: string | null | undefined, kind: string) {
-  const { language } = useI18n();
+  const { language } = useAppLanguage();
   const sourceText = text?.trim() ?? '';
   const cacheKey = useMemo(() => `${language}|${kind}|${sourceText}`, [language, kind, sourceText]);
   const [translated, setTranslated] = useState(language === 'pt-BR' ? sourceText : '');

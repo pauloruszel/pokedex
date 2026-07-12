@@ -1,22 +1,21 @@
 import { useMemo, useState } from 'react';
 import type { PokemonDetail, PokemonSummary } from '../../pokemon/types/pokemon';
-import {
-  buildDeckPool,
-  chooseCpuAttribute,
-  compareCards,
-  createTrunfoCard,
-  splitDeck
-} from '../utils/trunfoRules';
+import { buildDeckPool, splitDeck } from '../utils/trunfoDeck';
+import { createTrunfoCard } from '../utils/trunfoCardFactory';
+import { chooseCpuAttribute, compareCards } from '../utils/trunfoRules';
+import type {
+  TrunfoAttributeKey,
+  TrunfoCardModel
+} from '../types/trunfoCard';
 import type {
   GameStatus,
   RoundHistoryItem,
-  TrunfoAttributeKey,
-  TrunfoCardModel,
   TrunfoDifficulty
-} from '../types/trunfo';
+} from '../types/trunfoGame';
 
 type StartGameParams = {
-  candidates: PokemonSummary[];
+  candidates?: PokemonSummary[];
+  cards?: TrunfoCardModel[];
   difficulty: TrunfoDifficulty;
   loadDetail: (pokemon: PokemonSummary) => Promise<PokemonDetail>;
 };
@@ -43,7 +42,7 @@ export function useTrunfoGame() {
     return null;
   }, [cpuDeck.length, playerDeck.length]);
 
-  async function startGame({ candidates, difficulty: nextDifficulty, loadDetail }: StartGameParams) {
+  async function startGame({ candidates = [], cards, difficulty: nextDifficulty, loadDetail }: StartGameParams) {
     setStatus('loading');
     setError(null);
     setHistory([]);
@@ -53,14 +52,15 @@ export function useTrunfoGame() {
     setDifficulty(nextDifficulty);
 
     try {
-      const pool = buildDeckPool(candidates, 40);
+      const readyCards = cards ?? [];
+      const pool = readyCards.length > 0 ? [] : buildDeckPool(candidates, 40);
 
-      if (pool.length < 4) {
+      if (readyCards.length < 4 && pool.length < 4) {
         throw new Error('Poucos Pokémon disponíveis para montar uma partida.');
       }
 
-      const details = await Promise.all(pool.map(async (pokemon) => createTrunfoCard(pokemon, await loadDetail(pokemon))));
-      const { playerDeck: nextPlayerDeck, cpuDeck: nextCpuDeck } = splitDeck(details);
+      const localCards = await Promise.all(pool.map(async (pokemon) => createTrunfoCard(pokemon, await loadDetail(pokemon))));
+      const { playerDeck: nextPlayerDeck, cpuDeck: nextCpuDeck } = splitDeck(readyCards.length > 0 ? readyCards : localCards);
 
       setPlayerDeck(nextPlayerDeck);
       setCpuDeck(nextCpuDeck);

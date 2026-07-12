@@ -2,7 +2,8 @@ import type { CSSProperties, ReactNode } from 'react';
 import { ArrowRight, Dna, ImageIcon, Ruler, Scale, Sparkles, X } from 'lucide-react';
 import { TypeBadge } from '../../../shared/components/TypeBadge';
 import { StatBar } from '../../../shared/components/StatBar';
-import { useI18n } from '../../../shared/i18n/I18nProvider';
+import { useMessages } from '../../../shared/i18n/I18nProvider';
+import { statLabel } from '../../../shared/i18n/labels';
 import { useTranslatedText } from '../../../shared/i18n/useTranslatedText';
 import { assetUrl } from '../../../shared/utils/assets';
 import { formatAbilityName, formatGenerationName, formatHabitatName, formatPokemonName, formatPokemonNumber } from '../../../shared/utils/format';
@@ -16,9 +17,7 @@ type Props = {
 };
 
 export function PokemonDetailDrawer({ pokemon, isLoading, onClose }: Props) {
-  const { messages } = useI18n();
-  const translatedGenus = useTranslatedText(pokemon?.species?.genus, 'pokemon_genus');
-  const translatedFlavor = useTranslatedText(pokemon?.species?.flavorText, 'pokemon_flavor_text');
+  const messages = useMessages();
   const generationText = useTranslatedText(
     pokemon?.species?.generation ? formatGenerationName(pokemon.species.generation) : null,
     'pokemon_generation'
@@ -51,9 +50,9 @@ export function PokemonDetailDrawer({ pokemon, isLoading, onClose }: Props) {
               <div className="detail-hero-copy">
                 <span className="detail-number">{formatPokemonNumber(pokemon.id)}</span>
                 <h2>{formatPokemonName(pokemon.name)}</h2>
-                <p>{translatedGenus.text || messages.detail.fallbackGenus}</p>
+                <p>{pokemon.species?.genus || messages.detail.fallbackGenus}</p>
                 <div className="type-list type-list--left">
-                  {pokemon.types.map((type) => <TypeBadge type={type} key={type} />)}
+                  {pokemon.types.map((type) => <TypeBadge type={type} label={messages.types[type as keyof typeof messages.types]} key={type} />)}
                 </div>
               </div>
 
@@ -65,7 +64,7 @@ export function PokemonDetailDrawer({ pokemon, isLoading, onClose }: Props) {
 
             <section className="flavor-panel">
               <Sparkles size={18} />
-              <p>{translatedFlavor.text || messages.detail.noDescription}</p>
+              <p>{pokemon.species?.flavorText || (isLoading ? messages.detail.translating : messages.detail.noDescription)}</p>
             </section>
 
             {hasFullDetail ? <section className="metric-grid">
@@ -79,7 +78,7 @@ export function PokemonDetailDrawer({ pokemon, isLoading, onClose }: Props) {
               <section className="detail-card-panel">
                 <h3>{messages.detail.stats}</h3>
                 <div className="stats-list">
-                  {pokemon.stats.map((stat) => <StatBar key={stat.name} name={stat.name} value={stat.value} />)}
+                  {pokemon.stats.map((stat) => <StatBar key={stat.name} name={stat.name} value={stat.value} label={statLabel(stat.name, messages)} />)}
                 </div>
               </section>
 

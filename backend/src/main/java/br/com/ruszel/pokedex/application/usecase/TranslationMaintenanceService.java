@@ -1,6 +1,6 @@
 package br.com.ruszel.pokedex.application.usecase;
 
-import br.com.ruszel.pokedex.application.port.PokemonRepository;
+import br.com.ruszel.pokedex.application.port.PokemonDetailRepository;
 import br.com.ruszel.pokedex.infrastructure.localization.SpeciesTextLocalizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,8 +18,9 @@ public class TranslationMaintenanceService {
     public static final String REFRESH_JOB_NAME = "translation-refresh";
 
     private final JdbcClient jdbcClient;
-    private final PokemonRepository pokemonRepository;
+    private final PokemonDetailRepository pokemonRepository;
     private final TranslationJobStatusService translationJobStatusService;
+    private final TranslationCacheService translationCacheService;
 
     public List<MissingTranslation> findMissingFlavorTexts(int limit) {
         return jdbcClient.sql("""
@@ -73,6 +74,10 @@ public class TranslationMaintenanceService {
     public TranslationJobStatusService.TranslationJobStatus refreshStatus() {
         return translationJobStatusService.current(REFRESH_JOB_NAME)
                 .orElse(new TranslationJobStatusService.TranslationJobStatus(REFRESH_JOB_NAME, "IDLE", 0, 0, 0, null, null, null, null));
+    }
+
+    public TranslationCacheService.CleanupResult cleanupInvalidCache() {
+        return translationCacheService.cleanupInvalidCachedTranslations();
     }
 
     private boolean hasCurrentFlavorText(int pokemonId) {

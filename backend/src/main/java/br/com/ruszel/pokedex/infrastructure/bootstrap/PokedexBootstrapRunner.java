@@ -1,6 +1,6 @@
 package br.com.ruszel.pokedex.infrastructure.bootstrap;
 
-import br.com.ruszel.pokedex.application.port.PokemonRepository;
+import br.com.ruszel.pokedex.application.port.PokemonDetailRepository;
 import br.com.ruszel.pokedex.application.usecase.CachePokemonImageUseCase;
 import br.com.ruszel.pokedex.application.usecase.TranslationJobStatusService;
 import br.com.ruszel.pokedex.infrastructure.localization.SpeciesTextLocalizer;
@@ -27,7 +27,7 @@ public class PokedexBootstrapRunner implements CommandLineRunner {
     private final JdbcClient jdbcClient;
     private final WebClient pokeApiWebClient;
     private final CachePokemonImageUseCase cachePokemonImageUseCase;
-    private final PokemonRepository pokemonRepository;
+    private final PokemonDetailRepository pokemonRepository;
     private final TranslationJobStatusService translationJobStatusService;
     private final TaskExecutor pokedexTaskExecutor;
 

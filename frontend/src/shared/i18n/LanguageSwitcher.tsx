@@ -1,9 +1,10 @@
 import { Languages } from 'lucide-react';
-import { languageOptions } from './messages';
-import { useI18n } from './I18nProvider';
+import { languageOptions } from './language';
+import { useAppLanguage, useMessages } from './I18nProvider';
 
 export function LanguageSwitcher() {
-  const { language, setLanguage, messages } = useI18n();
+  const { language, setLanguage } = useAppLanguage();
+  const messages = useMessages();
   const current = languageOptions.find((option) => option.code === language) ?? languageOptions[0];
 
   return (

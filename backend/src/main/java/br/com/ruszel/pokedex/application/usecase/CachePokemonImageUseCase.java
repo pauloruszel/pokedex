@@ -1,7 +1,5 @@
 package br.com.ruszel.pokedex.application.usecase;
 
-import br.com.ruszel.pokedex.application.port.ImageStorageGateway;
-import br.com.ruszel.pokedex.application.port.PokemonImageRepository;
 import br.com.ruszel.pokedex.domain.model.PokemonImage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,28 +14,25 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 @Slf4j
 public class CachePokemonImageUseCase {
-    private static final String PUBLIC_URL_TEMPLATE = "/api/pokemon/%d/images/%s";
-
-    private final ImageStorageGateway imageStorageGateway;
-    private final PokemonImageRepository pokemonImageRepository;
+    private final PokemonImageCacheService pokemonImageCacheService;
     private final TaskExecutor pokedexTaskExecutor;
     private final Set<String> inFlight = ConcurrentHashMap.newKeySet();
 
     public String execute(Integer pokemonId, String imageType, String sourceUrl) {
-        String publicUrl = PUBLIC_URL_TEMPLATE.formatted(pokemonId, imageType);
+        String publicUrl = pokemonImageCacheService.publicUrl(pokemonId, imageType);
 
         if (sourceUrl == null || sourceUrl.isBlank()) {
             return publicUrl;
         }
 
-        var existing = pokemonImageRepository.findByPokemonIdAndType(pokemonId, imageType);
-        if (existing.isPresent() && existing.get().localPath() != null && !existing.get().localPath().isBlank()) {
+        var existing = pokemonImageCacheService.findMetadata(pokemonId, imageType);
+        if (existing.isPresent() && pokemonImageCacheService.hasCachedFile(existing.get())) {
             log.debug("image cache hit pokemonId={} type={}", pokemonId, imageType);
             return existing.get().publicUrl();
         }
 
         if (existing.isEmpty()) {
-            pokemonImageRepository.save(new PokemonImage(pokemonId, imageType, sourceUrl, null, publicUrl, null, null));
+            pokemonImageCacheService.savePending(pokemonId, imageType, sourceUrl, publicUrl);
         }
 
         enqueueCache(pokemonId, imageType, sourceUrl, publicUrl);
@@ -66,12 +61,11 @@ public class CachePokemonImageUseCase {
 
     private void cacheAndPersist(Integer pokemonId, String imageType, String sourceUrl, String publicUrl) {
         try {
-            PokemonImage image = imageStorageGateway.cache(pokemonId, imageType, sourceUrl, publicUrl);
-            pokemonImageRepository.save(image);
+            PokemonImage image = pokemonImageCacheService.cacheAndPersist(pokemonId, imageType, sourceUrl, publicUrl);
             log.debug("image cached pokemonId={} type={} sizeBytes={}", pokemonId, imageType, image.sizeBytes());
         } catch (Exception exception) {
-            log.warn("Não foi possível cachear imagem {} do Pokémon {}. A URL pública interna será mantida.", imageType, pokemonId, exception);
-            pokemonImageRepository.save(new PokemonImage(pokemonId, imageType, sourceUrl, null, publicUrl, null, null));
+            log.warn("Could not cache image {} for Pokemon {}. Internal public URL will be kept.", imageType, pokemonId, exception);
+            pokemonImageCacheService.savePending(pokemonId, imageType, sourceUrl, publicUrl);
         }
     }
 }

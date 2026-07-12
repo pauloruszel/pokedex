@@ -1,7 +1,7 @@
 package br.com.ruszel.pokedex.api.controller;
 
 import br.com.ruszel.pokedex.application.usecase.TranslationMaintenanceService;
-import br.com.ruszel.pokedex.application.usecase.TranslateTextUseCase;
+import br.com.ruszel.pokedex.application.usecase.TranslationCacheService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +16,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TranslationMaintenanceController {
     private final TranslationMaintenanceService translationMaintenanceService;
-    private final TranslateTextUseCase translateTextUseCase;
 
     @GetMapping("/missing")
     public List<TranslationMaintenanceService.MissingTranslation> missing(
@@ -38,7 +37,7 @@ public class TranslationMaintenanceController {
     }
 
     @PostMapping("/cleanup-invalid-cache")
-    public TranslateTextUseCase.CleanupResult cleanupInvalidCache() {
-        return translateTextUseCase.cleanupInvalidCachedTranslations();
+    public TranslationCacheService.CleanupResult cleanupInvalidCache() {
+        return translationMaintenanceService.cleanupInvalidCache();
     }
 }

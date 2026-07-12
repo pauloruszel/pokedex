@@ -1,10 +1,6 @@
-export type AppLanguage = 'pt-BR' | 'es' | 'en';
+import type { AppLanguage } from './language';
+export { languageOptions, type AppLanguage } from './language';
 
-export const languageOptions: Array<{ code: AppLanguage; label: string; shortLabel: string; flag: string }> = [
-  { code: 'pt-BR', label: 'Português', shortLabel: 'PT', flag: '🇧🇷' },
-  { code: 'es', label: 'Español', shortLabel: 'ES', flag: '🇪🇸' },
-  { code: 'en', label: 'English', shortLabel: 'EN', flag: '🇺🇸' }
-];
 
 export const messages = {
   ptBR: {
@@ -60,6 +56,7 @@ export const messages = {
     detail: {
       close: 'Fechar detalhes',
       loading: 'Carregando dossiê Pokémon...',
+      translating: 'Traduzindo descrição...',
       fallbackGenus: 'Pokémon',
       noDescription: 'Nenhuma descrição disponível para esta espécie.',
       progress: 'Carregando atributos, habilidades e linha evolutiva...',
@@ -201,6 +198,7 @@ export const messages = {
     detail: {
       close: 'Cerrar detalles',
       loading: 'Cargando dossier Pokémon...',
+      translating: 'Traduciendo descripción...',
       fallbackGenus: 'Pokémon',
       noDescription: 'No hay descripción disponible para esta especie.',
       progress: 'Cargando atributos, habilidades y línea evolutiva...',
@@ -342,6 +340,7 @@ export const messages = {
     detail: {
       close: 'Close details',
       loading: 'Loading Pokémon dossier...',
+      translating: 'Translating description...',
       fallbackGenus: 'Pokémon',
       noDescription: 'No description available for this species.',
       progress: 'Loading attributes, abilities and evolution line...',

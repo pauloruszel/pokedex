@@ -1,6 +1,6 @@
 import { Dices, Layers3, Play, SlidersHorizontal } from 'lucide-react';
-import { useI18n } from '../../../shared/i18n/I18nProvider';
-import type { TrunfoDifficulty, TrunfoMode, TrunfoSetup } from '../types/trunfo';
+import { useMessages } from '../../../shared/i18n/I18nProvider';
+import type { TrunfoDifficulty, TrunfoMode, TrunfoSetup } from '../types/trunfoGame';
 
 type Props = {
   setup: TrunfoSetup;
@@ -13,7 +13,7 @@ type Props = {
 };
 
 export function GameSetup({ setup, types, favoritesCount, isLoading, error, onChange, onStart }: Props) {
-  const { messages } = useI18n();
+  const messages = useMessages();
   const difficulties: Array<{ value: TrunfoDifficulty; label: string; description: string }> = [
     { value: 'balanced', label: messages.trunfo.balanced, description: messages.trunfo.balancedDescription },
     { value: 'casual', label: messages.trunfo.casual, description: messages.trunfo.casualDescription },

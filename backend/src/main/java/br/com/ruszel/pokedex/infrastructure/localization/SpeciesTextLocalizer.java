@@ -1,14 +1,10 @@
 package br.com.ruszel.pokedex.infrastructure.localization;
 
+import br.com.ruszel.pokedex.application.usecase.TranslationCacheService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.HexFormat;
 import java.util.Map;
 import java.util.Optional;
 
@@ -64,7 +60,7 @@ public class SpeciesTextLocalizer {
             )
     );
 
-    private final JdbcClient jdbcClient;
+    private final TranslationCacheService translationCacheService;
     private final PtBrTranslationGateway translationGateway;
 
     public String localizeGenus(String sourceText) {
@@ -81,20 +77,12 @@ public class SpeciesTextLocalizer {
         }
 
         String normalized = normalize(sourceText);
-        String key = key(kind, normalized);
-
-        Optional<String> cached = jdbcClient.sql("""
-                        SELECT translated_text
-                          FROM pokemon_text_translation
-                         WHERE translation_key = :key
-                        """)
-                .param("key", key)
-                .query(String.class)
-                .optional();
+        Optional<TranslationCacheService.CachedTranslation> cached =
+                translationCacheService.findLocal(CACHE_LOCALE, kind, normalized);
 
         if (cached.isPresent()) {
-            log.debug("translation cache hit kind={} key={}", kind, key);
-            return cached.get();
+            log.debug("translation cache hit kind={}", kind);
+            return cached.get().translatedText();
         }
 
         String translated = dictionary.get(normalized);
@@ -106,26 +94,13 @@ public class SpeciesTextLocalizer {
         }
 
         if (translated == null) {
-            log.warn("translation_missing kind={} key={}. Returning null without caching.", kind, key);
+            log.warn("translation_missing kind={}. Returning null without caching.", kind);
             return null;
         }
 
-        jdbcClient.sql("""
-                        MERGE INTO pokemon_text_translation (
-                            translation_key, source_text, text_kind, locale, translated_text, translation_source, updated_at
-                        )
-                        KEY(translation_key)
-                        VALUES (:key, :sourceText, :kind, :locale, :translatedText, :translationSource, CURRENT_TIMESTAMP)
-                        """)
-                .param("key", key)
-                .param("sourceText", normalized)
-                .param("kind", kind)
-                .param("locale", CACHE_LOCALE)
-                .param("translatedText", translated)
-                .param("translationSource", source)
-                .update();
+        translationCacheService.saveLocal(CACHE_LOCALE, kind, normalized, translated, source);
 
-        log.debug("translation cached kind={} source={} key={}", kind, source, key);
+        log.debug("translation cached kind={} source={}", kind, source);
         return translated;
     }
 
@@ -137,20 +112,4 @@ public class SpeciesTextLocalizer {
                 .trim();
     }
 
-    private String fallbackPtBr(String text) {
-        return text
-                .replace("Pokemon", "Pokémon")
-                .replace("POKéMON", "Pokémon")
-                .replace("POKÉMON", "Pokémon");
-    }
-
-    private String key(String kind, String sourceText) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest((CACHE_LOCALE + "|" + kind + "|" + sourceText).getBytes(StandardCharsets.UTF_8));
-            return HexFormat.of().formatHex(hash);
-        } catch (NoSuchAlgorithmException exception) {
-            throw new IllegalStateException("SHA-256 is required for translation cache keys", exception);
-        }
-    }
 }
