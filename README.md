@@ -1,17 +1,33 @@
-# Pokedex Clean Architecture
+# Pokédex Clean Architecture
 
-Pokedex full stack com backend Java/Spring Boot e frontend React/Vite. O projeto consome a PokeAPI, mantém cache local em H2, serve imagens pelo backend e oferece uma UI com Pokedex, favoritos, comparação e modo Trunfo.
+Aplicação full stack de Pokédex com **backend Java/Spring Boot** e **frontend React/Vite**. O projeto consome a PokeAPI, mantém cache local em H2, serve imagens pelo próprio backend e oferece uma interface com Pokédex, favoritos, comparação e modo Trunfo.
+
+## Sumário
+
+- [Stack](#stack)
+- [Executando com Docker](#executando-com-docker)
+- [Executando localmente](#executando-localmente)
+- [Build e testes](#build-e-testes)
+- [Arquitetura](#arquitetura)
+- [Endpoints](#endpoints)
+- [Configurações](#configurações)
+- [Cache e dados](#cache-e-dados)
+- [Tradução pt-BR](#tradução-pt-br)
+- [Graphify](#graphify)
+- [Problemas comuns](#problemas-comuns)
 
 ## Stack
 
-- Backend: Java 17, Spring Boot 4.1, WebFlux/WebClient, JDBC, H2, Actuator e Lombok.
-- Frontend: React 19.2, TypeScript, Vite e `lucide-react`.
-- Infra local: Docker Compose, volume H2 e volume de imagens.
-- Arquitetura: controllers finos, use cases por fluxo, portas de aplicação e adapters de infraestrutura.
+| Camada | Tecnologias |
+| --- | --- |
+| Backend | Java 17, Spring Boot 4.1, WebFlux/WebClient, JDBC, H2, Actuator, Lombok |
+| Frontend | React 19.2, TypeScript, Vite, lucide-react |
+| Infra local | Docker Compose, volumes Docker para H2 e imagens |
+| Arquitetura | Clean Architecture, use cases, portas de aplicação e adapters |
 
-## Como Rodar
+## Executando com Docker
 
-Com Docker, na raiz:
+Na raiz do projeto:
 
 ```bash
 docker compose up --build
@@ -19,17 +35,23 @@ docker compose up --build
 
 Acesse:
 
-```text
-Frontend: http://localhost:3000
-Backend:  http://localhost:8080
-```
+| Serviço | URL |
+| --- | --- |
+| Frontend | <http://localhost:3000> |
+| Backend | <http://localhost:8080> |
 
-Localmente:
+O Compose faz build do backend e do frontend porque ambos usam `build:` no `docker-compose.yml`.
+
+## Executando localmente
+
+### Backend
 
 ```powershell
 cd backend
 .\mvnw.cmd spring-boot:run
 ```
+
+### Frontend
 
 ```powershell
 cd frontend
@@ -37,22 +59,22 @@ npm install
 npm run dev
 ```
 
-Por padrão o frontend usa `http://localhost:8080`. Para alterar:
+Por padrão, o frontend aponta para `http://localhost:8080`. Para alterar:
 
 ```text
 VITE_API_BASE_URL=http://localhost:8080
 ```
 
-## Build e Testes
+## Build e testes
 
-Backend:
+### Backend
 
 ```powershell
 cd backend
 .\mvnw.cmd test
 ```
 
-Frontend:
+### Frontend
 
 ```powershell
 cd frontend
@@ -61,34 +83,53 @@ npm run build
 
 O CI em `.github/workflows/build.yml` valida backend e frontend em push e pull request.
 
-## Backend
+## Arquitetura
 
-Fluxo principal:
+Fluxo principal do backend:
 
 ```text
 Controllers
-  -> use cases
-  -> portas de aplicação
-  -> adapters JDBC/PokeAPI/storage
+  -> Use cases
+  -> Portas de aplicação
+  -> Adapters JDBC/PokeAPI/storage
   -> H2, PokeAPI e filesystem
 ```
 
-Módulos principais:
+### Backend
 
-- `api/controller`: endpoints REST separados por catálogo, detalhe, imagem, i18n, Trunfo e manutenção de traduções.
-- `application/usecase`: regras de aplicação e orquestração dos fluxos.
-- `application/port`: contratos consumidos pelos use cases.
-- `domain/model`: modelos compartilhados do domínio.
-- `infrastructure/persistence`: cache JDBC separado em catálogo e detalhe.
-- `infrastructure/pokeapi`: cliente PokeAPI e mappers separados por summary, detail e species.
-- `infrastructure/localization`: tradução pt-BR e localização de species.
-- `infrastructure/storage`: cache físico de imagens.
+| Pacote | Responsabilidade |
+| --- | --- |
+| `api/controller` | Endpoints REST separados por catálogo, detalhe, imagem, i18n, Trunfo e manutenção de traduções |
+| `application/usecase` | Regras de aplicação e orquestração dos fluxos |
+| `application/port` | Contratos consumidos pelos use cases |
+| `domain/model` | Modelos compartilhados do domínio |
+| `infrastructure/persistence` | Cache JDBC separado em catálogo e detalhe |
+| `infrastructure/pokeapi` | Cliente PokeAPI e mappers separados por summary, detail e species |
+| `infrastructure/localization` | Tradução pt-BR e localização de textos de species |
+| `infrastructure/storage` | Cache físico de imagens |
 
-### Endpoints
+### Frontend
 
-Pokemon:
+| Diretório | Responsabilidade |
+| --- | --- |
+| `app/App.tsx` | Composição global mínima |
+| `app/AppChrome.tsx` | Shell visual, navegação e troca de idioma |
+| `app/AppRoutes.tsx` | Seleção das views |
+| `features/pokemon` | API, tipos, hook `usePokemonExplorer`, listagem e detalhe |
+| `features/favorites` | Favoritos salvos em `localStorage` |
+| `features/compare` | Comparação de dois Pokémon |
+| `features/trunfo` | API, DTO/mapper, tipos, regras, deck e estado do jogo |
+| `shared/api` | Configuração da URL base do backend |
+| `shared/i18n` | Idioma, mensagens, labels e tradução sob demanda |
+| `shared/components` e `shared/utils` | Componentes e helpers reutilizáveis |
 
-```text
+O frontend não busca imagens externas diretamente. Ele consome URLs internas servidas pelo backend.
+
+## Endpoints
+
+### Pokémon
+
+```http
 GET /api/pokemon?limit=24&offset=0
 GET /api/pokemon/search?q=pikachu
 GET /api/pokemon/types
@@ -97,64 +138,57 @@ GET /api/pokemon/{nameOrId}
 GET /api/pokemon/{pokemonId}/images/{imageType}
 ```
 
-Trunfo:
+### Trunfo
 
-```text
+```http
 GET /api/trunfo/cards?limit=24&offset=0
 ```
 
-i18n:
+### i18n
 
-```text
+```http
 POST /api/i18n/translate
 ```
 
-Admin de traduções:
+### Administração de traduções
 
-```text
+```http
 GET  /api/admin/translations/missing?limit=2000
 POST /api/admin/translations/refresh?limit=2000
 GET  /api/admin/translations/status
 POST /api/admin/translations/cleanup-invalid-cache
 ```
 
-Actuator:
+Endpoints admin exigem:
 
-```text
+```http
+X-Admin-Token: local-dev-token
+```
+
+### Actuator
+
+```http
 GET /actuator/health
 GET /actuator/metrics
 ```
 
-Endpoints admin exigem:
+## Configurações
 
-```text
-X-Admin-Token: local-dev-token
-```
+Principais variáveis de ambiente:
 
-Configure outro token com:
+| Variável | Padrão | Uso |
+| --- | --- | --- |
+| `SERVER_PORT` | `8080` | Porta do backend |
+| `POKEAPI_BASE_URL` | `https://pokeapi.co/api/v2` | URL da PokeAPI |
+| `POKEDEX_BOOTSTRAP_ENABLED` | `true` | Ativa carga inicial |
+| `POKEDEX_BOOTSTRAP_LIMIT` | `1025` | Limite de Pokémon no bootstrap |
+| `POKEDEX_BOOTSTRAP_DETAILS_ENABLED` | `true` | Carrega detalhes no bootstrap |
+| `POKEDEX_IMAGES_STORAGE_PATH` | `./data/pokedex-images` | Diretório de imagens |
+| `POKEDEX_ADMIN_ENABLED` | `true` | Ativa endpoints admin |
+| `POKEDEX_ADMIN_TOKEN` | `local-dev-token` | Token dos endpoints admin |
+| `VITE_API_BASE_URL` | `http://localhost:8080` | URL do backend usada pelo frontend |
 
-```text
-POKEDEX_ADMIN_TOKEN=um-token-local
-```
-
-## Frontend
-
-Estrutura atual:
-
-- `app/App.tsx`: composição global mínima.
-- `app/AppChrome.tsx`: shell visual, navegação e troca de idioma.
-- `app/AppRoutes.tsx`: seleção das views.
-- `features/pokemon`: API, tipos, hook `usePokemonExplorer`, Pokedex e componentes de detalhe/lista.
-- `features/favorites`: favoritos salvos em `localStorage`.
-- `features/compare`: comparação de dois Pokemon.
-- `features/trunfo`: API, DTO/mapper, tipos, regras, deck e estado do jogo.
-- `shared/api/apiConfig.ts`: base URL do backend.
-- `shared/i18n`: contrato de idioma, mensagens, labels e tradução sob demanda.
-- `shared/components` e `shared/utils`: componentes e helpers pequenos reutilizáveis.
-
-O frontend não busca imagens externas diretamente. Ele recebe URLs internas do backend.
-
-## Cache e Dados
+## Cache e dados
 
 Scripts de banco:
 
@@ -163,15 +197,10 @@ backend/src/main/resources/db/schema.sql
 backend/src/main/resources/db/data.sql
 ```
 
-Banco H2 em Docker:
+Paths usados no Docker:
 
 ```text
 /data/h2/pokedex-db
-```
-
-Imagens em Docker:
-
-```text
 /data/pokedex-images
 ```
 
@@ -206,7 +235,7 @@ PokeAPI em inglês
   -> frontend lê o backend
 ```
 
-Configurações principais:
+Configurações:
 
 ```text
 POKEDEX_TRANSLATION_ENABLED=true
@@ -226,16 +255,27 @@ Se a tradução falhar, o backend mantém o item pendente para nova tentativa.
 
 ## Graphify
 
-O projeto mantém saídas do Graphify em `graphify-out/` para acompanhar acoplamento e coesão entre módulos.
+As saídas do Graphify são geradas em `graphify-out/` e não devem ser versionadas.
 
 Atualizar o grafo:
 
 ```powershell
-graphify . --update
-graphify label --backend gemini
+& "$(Get-Content graphify-out/.graphify_python)" -m graphify . --update
 ```
 
-Relatórios principais:
+Recalcular comunidades:
+
+```powershell
+& "$(Get-Content graphify-out/.graphify_python)" -m graphify cluster-only C:\workspace\projetos_novos\pokedex-clean
+```
+
+Atualizar labels com Gemini:
+
+```powershell
+& "$(Get-Content graphify-out/.graphify_python)" -m graphify label --backend gemini
+```
+
+Relatórios gerados localmente:
 
 ```text
 graphify-out/GRAPH_REPORT.md
@@ -243,26 +283,36 @@ graphify-out/graph.html
 graphify-out/graph.json
 ```
 
-## Problemas Comuns
+## Problemas comuns
 
-Docker Desktop desligado: abra o Docker Desktop antes de `docker compose up --build`.
+### Docker Desktop desligado
 
-Porta ocupada: libere `3000` para o frontend ou `8080` para o backend, ou ajuste as portas no Compose.
+Abra o Docker Desktop antes de rodar:
 
-Resetar banco e imagens:
+```bash
+docker compose up --build
+```
+
+### Portas ocupadas
+
+Libere as portas `3000` e `8080`, ou ajuste o mapeamento no `docker-compose.yml`.
+
+### Resetar banco e imagens
 
 ```powershell
 docker compose down -v
 docker compose up --build
 ```
 
-Desativar bootstrap inicial:
+Esse comando remove os volumes `pokedex-h2-data`, `pokedex-images` e `libretranslate-data`.
+
+### Desativar bootstrap inicial
 
 ```text
 POKEDEX_BOOTSTRAP_ENABLED=false
 ```
 
-Reduzir carga inicial:
+### Reduzir carga inicial
 
 ```text
 POKEDEX_BOOTSTRAP_LIMIT=151
