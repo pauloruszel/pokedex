@@ -16,6 +16,8 @@ import type {
 type StartGameParams = {
   candidates?: PokemonSummary[];
   cards?: TrunfoCardModel[];
+  playerCards?: TrunfoCardModel[];
+  cpuCards?: TrunfoCardModel[];
   difficulty: TrunfoDifficulty;
   loadDetail: (pokemon: PokemonSummary) => Promise<PokemonDetail>;
 };
@@ -42,7 +44,7 @@ export function useTrunfoGame() {
     return null;
   }, [cpuDeck.length, playerDeck.length]);
 
-  async function startGame({ candidates = [], cards, difficulty: nextDifficulty, loadDetail }: StartGameParams) {
+  async function startGame({ candidates = [], cards, playerCards, cpuCards, difficulty: nextDifficulty, loadDetail }: StartGameParams) {
     setStatus('loading');
     setError(null);
     setHistory([]);
@@ -52,6 +54,13 @@ export function useTrunfoGame() {
     setDifficulty(nextDifficulty);
 
     try {
+      if (playerCards?.length && cpuCards?.length) {
+        setPlayerDeck(playerCards);
+        setCpuDeck(cpuCards);
+        setStatus('ready');
+        return;
+      }
+
       const readyCards = cards ?? [];
       const pool = readyCards.length > 0 ? [] : buildDeckPool(candidates, 40);
 

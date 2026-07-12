@@ -27,6 +27,7 @@ export function RoundHistory({ history }: Props) {
             <article className={`trunfo-history-item trunfo-history-item--${item.result}`} key={item.round}>
               <span>{messages.trunfo.round} {item.round}</span>
               <strong>{item.result === 'player' ? messages.common.you : item.result === 'cpu' ? messages.common.cpu : messages.common.draw}</strong>
+              <mark>{messages.trunfo.diff}: {Math.abs(item.playerValue - item.cpuValue)}</mark>
               <small>
                 {getAttributeLabel(item.attribute, messages)}: {formatPokemonName(item.playerName)} {formatAttributeValue(item.attribute, item.playerValue)}
                 {' '}x {formatAttributeValue(item.attribute, item.cpuValue)} {formatPokemonName(item.cpuName)}

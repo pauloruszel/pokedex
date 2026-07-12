@@ -22,13 +22,13 @@ export const messages = {
       changeTo: 'Alterar idioma para'
     },
     hero: {
-      brand: 'Pokédex Lab',
-      eyebrow: 'Console premium com backend próprio',
-      title: 'Explore Pokémon como se estivesse em um laboratório de batalha.',
-      description: 'Interface responsiva, favoritos locais, comparação de status, dossiê detalhado e imagens servidas somente pelo backend Java com cache persistente em Docker.',
-      trunfoEyebrow: 'Modo competitivo de cartas',
+      brand: 'Pokédex',
+      eyebrow: 'Consulta de Pokémon',
+      title: 'Busque Pokémon, veja detalhes e monte suas listas.',
+      description: 'Pesquise por nome ou número, filtre por tipo, marque favoritos, compare atributos e jogue Super Trunfo.',
+      trunfoEyebrow: 'Modo de cartas',
       trunfoTitle: 'Super Trunfo Pokémon',
-      trunfoDescription: 'Monte um baralho com dados reais da Pokédex, escolha atributos com estratégia e dispute carta por carta contra a CPU.'
+      trunfoDescription: 'Escolha cartas, selecione atributos e dispute rodada por rodada contra a CPU.'
     },
     search: {
       placeholder: 'Busque por nome ou número: pikachu, charizard, 25...',
@@ -37,7 +37,7 @@ export const messages = {
       allTypes: 'Todos'
     },
     pokedex: {
-      eyebrow: 'Discovery Grid',
+      eyebrow: 'Lista',
       title: 'Pokémon encontrados',
       records: 'registros',
       emptyTitle: 'Nenhum Pokémon encontrado',
@@ -51,11 +51,11 @@ export const messages = {
       openDetails: 'Abrir detalhes de',
       favorite: 'Favoritar',
       compare: 'Comparar',
-      inspect: 'Ver dossiê'
+      inspect: 'Ver detalhes'
     },
     detail: {
       close: 'Fechar detalhes',
-      loading: 'Carregando dossiê Pokémon...',
+      loading: 'Carregando detalhes do Pokémon...',
       translating: 'Traduzindo descrição...',
       fallbackGenus: 'Pokémon',
       noDescription: 'Nenhuma descrição disponível para esta espécie.',
@@ -71,7 +71,7 @@ export const messages = {
       noEvolution: 'Sem cadeia evolutiva disponível'
     },
     favorites: {
-      eyebrow: 'Coleção local',
+      eyebrow: 'Favoritos',
       title: 'Favoritos',
       emptyTitle: 'Nenhum favorito ainda',
       emptyDescription: 'Marque seus Pokémon preferidos no coração dos cards para montar sua coleção local.',
@@ -81,8 +81,8 @@ export const messages = {
       title: 'Comparador de Pokémon',
       emptyDescription: 'Selecione dois Pokémon usando o botão "+" nos cards. A comparação destaca o vencedor em cada atributo.',
       loading: 'Montando comparação...',
-      eyebrow: 'Battle Lab',
-      description: 'Comparação técnica por status base, tipo, altura e peso.'
+      eyebrow: 'Comparação',
+      description: 'Compare status base, tipo, altura e peso.'
     },
     trunfo: {
       setupEyebrow: 'Super Trunfo Pokémon',
@@ -92,6 +92,11 @@ export const messages = {
       modeAll: 'Todos',
       modeFavorites: 'Favoritos',
       modeType: 'Por tipo',
+      deckSelection: 'Escolha do deck',
+      autoDeck: 'Automático',
+      autoDeckDescription: 'A API monta e embaralha os decks automaticamente.',
+      manualDeck: 'Personalizado',
+      manualDeckDescription: 'Você escolhe suas cartas e a CPU recebe um deck equivalente.',
       favoriteRequirement: 'Use pelo menos 40 favoritos para uma partida completa.',
       difficulty: 'Dificuldade',
       balanced: 'Equilibrado',
@@ -103,6 +108,17 @@ export const messages = {
       loadingDecks: 'Montando baralhos...',
       start: 'Iniciar partida',
       setupError: 'Não foi possível montar o baralho agora.',
+      draftEyebrow: 'Escolha manual',
+      draftTitle: 'Escolha suas cartas',
+      draftDescription: 'A CPU recebe automaticamente cartas de raridade e força próximas às suas escolhas.',
+      draftSearch: 'Buscar carta por nome ou número',
+      draftError: 'Escolha pelo menos 4 cartas e deixe cartas suficientes para a CPU.',
+      loadMoreCards: 'Carregar mais cartas',
+      confirmDeck: 'Confirmar baralho',
+      backToSetup: 'Voltar ao setup',
+      cardPower: 'Força',
+      bestAttribute: 'Melhor atributo',
+      diff: 'Diferença',
       round: 'Rodada',
       dispute: 'Disputa acumulada: próxima vitória leva {count} cartas.',
       matchWinner: '{winner} venceu a partida',
@@ -174,17 +190,17 @@ export const messages = {
     nav: { explore: 'Explorar', favorites: 'Favoritos', compare: 'Comparar', trunfo: 'Trunfo' },
     language: { label: 'Idioma', changeTo: 'Cambiar idioma a' },
     hero: {
-      brand: 'Pokédex Lab',
-      eyebrow: 'Consola premium con backend propio',
-      title: 'Explora Pokémon como si estuvieras en un laboratorio de batalla.',
-      description: 'Interfaz responsive, favoritos locales, comparación de estadísticas, dossier detallado e imágenes servidas solo por el backend Java con caché persistente en Docker.',
-      trunfoEyebrow: 'Modo competitivo de cartas',
+      brand: 'Pokédex',
+      eyebrow: 'Consulta de Pokémon',
+      title: 'Busca Pokémon, mira detalles y arma tus listas.',
+      description: 'Busca por nombre o número, filtra por tipo, marca favoritos, compara atributos y juega Super Trunfo.',
+      trunfoEyebrow: 'Modo de cartas',
       trunfoTitle: 'Super Trunfo Pokémon',
-      trunfoDescription: 'Arma un mazo con datos reales de la Pokédex, elige atributos con estrategia y compite carta por carta contra la CPU.'
+      trunfoDescription: 'Elige cartas, selecciona atributos y disputa cada ronda contra la CPU.'
     },
     search: { placeholder: 'Busca por nombre o número: pikachu, charizard, 25...', submit: 'Buscar', quickTypes: 'Tipos rápidos', allTypes: 'Todos' },
     pokedex: {
-      eyebrow: 'Discovery Grid',
+      eyebrow: 'Lista',
       title: 'Pokémon encontrados',
       records: 'registros',
       emptyTitle: 'No se encontró ningún Pokémon',
@@ -194,10 +210,10 @@ export const messages = {
       page: 'Página',
       of: 'de'
     },
-    card: { openDetails: 'Abrir detalles de', favorite: 'Marcar favorito', compare: 'Comparar', inspect: 'Ver dossier' },
+    card: { openDetails: 'Abrir detalles de', favorite: 'Marcar favorito', compare: 'Comparar', inspect: 'Ver detalles' },
     detail: {
       close: 'Cerrar detalles',
-      loading: 'Cargando dossier Pokémon...',
+      loading: 'Cargando detalles del Pokémon...',
       translating: 'Traduciendo descripción...',
       fallbackGenus: 'Pokémon',
       noDescription: 'No hay descripción disponible para esta especie.',
@@ -213,7 +229,7 @@ export const messages = {
       noEvolution: 'Sin cadena evolutiva disponible'
     },
     favorites: {
-      eyebrow: 'Colección local',
+      eyebrow: 'Favoritos',
       title: 'Favoritos',
       emptyTitle: 'Aún no hay favoritos',
       emptyDescription: 'Marca tus Pokémon preferidos en el corazón de las tarjetas para crear tu colección local.',
@@ -223,8 +239,8 @@ export const messages = {
       title: 'Comparador de Pokémon',
       emptyDescription: 'Selecciona dos Pokémon con el botón "+" en las tarjetas. La comparación destaca el ganador en cada atributo.',
       loading: 'Preparando comparación...',
-      eyebrow: 'Battle Lab',
-      description: 'Comparación técnica por estadísticas base, tipo, altura y peso.'
+      eyebrow: 'Comparación',
+      description: 'Compara estadísticas base, tipo, altura y peso.'
     },
     trunfo: {
       setupEyebrow: 'Super Trunfo Pokémon',
@@ -234,6 +250,11 @@ export const messages = {
       modeAll: 'Todos',
       modeFavorites: 'Favoritos',
       modeType: 'Por tipo',
+      deckSelection: 'Selección del mazo',
+      autoDeck: 'Automático',
+      autoDeckDescription: 'La API arma y mezcla los mazos automáticamente.',
+      manualDeck: 'Personalizado',
+      manualDeckDescription: 'Tú eliges tus cartas y la CPU recibe un mazo equivalente.',
       favoriteRequirement: 'Usa al menos 40 favoritos para una partida completa.',
       difficulty: 'Dificultad',
       balanced: 'Equilibrado',
@@ -245,6 +266,17 @@ export const messages = {
       loadingDecks: 'Armando mazos...',
       start: 'Iniciar partida',
       setupError: 'No fue posible armar el mazo ahora.',
+      draftEyebrow: 'Selección manual',
+      draftTitle: 'Elige tus cartas',
+      draftDescription: 'La CPU recibe automáticamente cartas de rareza y fuerza cercanas a tus elecciones.',
+      draftSearch: 'Buscar carta por nombre o número',
+      draftError: 'Elige al menos 4 cartas y deja suficientes cartas para la CPU.',
+      loadMoreCards: 'Cargar más cartas',
+      confirmDeck: 'Confirmar mazo',
+      backToSetup: 'Volver al setup',
+      cardPower: 'Fuerza',
+      bestAttribute: 'Mejor atributo',
+      diff: 'Diferencia',
       round: 'Ronda',
       dispute: 'Disputa acumulada: la próxima victoria gana {count} cartas.',
       matchWinner: '{winner} ganó la partida',
@@ -316,17 +348,17 @@ export const messages = {
     nav: { explore: 'Explore', favorites: 'Favorites', compare: 'Compare', trunfo: 'Trunfo' },
     language: { label: 'Language', changeTo: 'Change language to' },
     hero: {
-      brand: 'Pokédex Lab',
-      eyebrow: 'Premium console with its own backend',
-      title: 'Explore Pokémon as if you were inside a battle lab.',
-      description: 'Responsive interface, local favorites, stat comparison, detailed dossiers and images served only by the Java backend with persistent Docker cache.',
-      trunfoEyebrow: 'Competitive card mode',
+      brand: 'Pokédex',
+      eyebrow: 'Pokémon lookup',
+      title: 'Search Pokémon, view details and build your lists.',
+      description: 'Search by name or number, filter by type, save favorites, compare attributes and play Super Trunfo.',
+      trunfoEyebrow: 'Card mode',
       trunfoTitle: 'Pokémon Super Trunfo',
-      trunfoDescription: 'Build a deck with real Pokédex data, choose attributes strategically and battle the CPU card by card.'
+      trunfoDescription: 'Choose cards, pick attributes and play each round against the CPU.'
     },
     search: { placeholder: 'Search by name or number: pikachu, charizard, 25...', submit: 'Search', quickTypes: 'Quick types', allTypes: 'All' },
     pokedex: {
-      eyebrow: 'Discovery Grid',
+      eyebrow: 'List',
       title: 'Pokémon found',
       records: 'records',
       emptyTitle: 'No Pokémon found',
@@ -336,10 +368,10 @@ export const messages = {
       page: 'Page',
       of: 'of'
     },
-    card: { openDetails: 'Open details for', favorite: 'Favorite', compare: 'Compare', inspect: 'View dossier' },
+    card: { openDetails: 'Open details for', favorite: 'Favorite', compare: 'Compare', inspect: 'View details' },
     detail: {
       close: 'Close details',
-      loading: 'Loading Pokémon dossier...',
+      loading: 'Loading Pokémon details...',
       translating: 'Translating description...',
       fallbackGenus: 'Pokémon',
       noDescription: 'No description available for this species.',
@@ -355,7 +387,7 @@ export const messages = {
       noEvolution: 'No evolution chain available'
     },
     favorites: {
-      eyebrow: 'Local collection',
+      eyebrow: 'Favorites',
       title: 'Favorites',
       emptyTitle: 'No favorites yet',
       emptyDescription: 'Mark your favorite Pokémon using the heart on the cards to build your local collection.',
@@ -365,8 +397,8 @@ export const messages = {
       title: 'Pokémon comparator',
       emptyDescription: 'Select two Pokémon using the "+" button on the cards. The comparison highlights the winner for each attribute.',
       loading: 'Preparing comparison...',
-      eyebrow: 'Battle Lab',
-      description: 'Technical comparison by base stats, type, height and weight.'
+      eyebrow: 'Comparison',
+      description: 'Compare base stats, type, height and weight.'
     },
     trunfo: {
       setupEyebrow: 'Pokémon Super Trunfo',
@@ -376,6 +408,11 @@ export const messages = {
       modeAll: 'All',
       modeFavorites: 'Favorites',
       modeType: 'By type',
+      deckSelection: 'Deck selection',
+      autoDeck: 'Automatic',
+      autoDeckDescription: 'The API builds and shuffles the decks automatically.',
+      manualDeck: 'Custom',
+      manualDeckDescription: 'You choose your cards and the CPU receives an equivalent deck.',
       favoriteRequirement: 'Use at least 40 favorites for a full match.',
       difficulty: 'Difficulty',
       balanced: 'Balanced',
@@ -387,6 +424,17 @@ export const messages = {
       loadingDecks: 'Building decks...',
       start: 'Start match',
       setupError: 'Could not build the deck right now.',
+      draftEyebrow: 'Manual pick',
+      draftTitle: 'Choose your cards',
+      draftDescription: 'The CPU automatically receives cards with similar rarity and strength to your picks.',
+      draftSearch: 'Search card by name or number',
+      draftError: 'Choose at least 4 cards and leave enough cards for the CPU.',
+      loadMoreCards: 'Load more cards',
+      confirmDeck: 'Confirm deck',
+      backToSetup: 'Back to setup',
+      cardPower: 'Power',
+      bestAttribute: 'Best attribute',
+      diff: 'Diff',
       round: 'Round',
       dispute: 'Accumulated dispute: next win takes {count} cards.',
       matchWinner: '{winner} won the match',

@@ -1,6 +1,6 @@
-import { Dices, Layers3, Play, SlidersHorizontal } from 'lucide-react';
+import { Dices, Hand, Layers3, Play, Shuffle, SlidersHorizontal } from 'lucide-react';
 import { useMessages } from '../../../shared/i18n/I18nProvider';
-import type { TrunfoDifficulty, TrunfoMode, TrunfoSetup } from '../types/trunfoGame';
+import type { TrunfoDeckSelection, TrunfoDifficulty, TrunfoMode, TrunfoSetup } from '../types/trunfoGame';
 
 type Props = {
   setup: TrunfoSetup;
@@ -23,6 +23,10 @@ export function GameSetup({ setup, types, favoritesCount, isLoading, error, onCh
     { value: 'all', label: messages.trunfo.modeAll },
     { value: 'favorites', label: messages.trunfo.modeFavorites },
     { value: 'type', label: messages.trunfo.modeType }
+  ];
+  const deckSelections: Array<{ value: TrunfoDeckSelection; label: string; description: string; icon: typeof Shuffle }> = [
+    { value: 'auto', label: messages.trunfo.autoDeck, description: messages.trunfo.autoDeckDescription, icon: Shuffle },
+    { value: 'manual', label: messages.trunfo.manualDeck, description: messages.trunfo.manualDeckDescription, icon: Hand }
   ];
 
   return (
@@ -74,6 +78,26 @@ export function GameSetup({ setup, types, favoritesCount, isLoading, error, onCh
                 <small>{difficulty.description}</small>
               </button>
             ))}
+          </div>
+        </div>
+
+        <div className="trunfo-control-group">
+          <span><Hand size={16} /> {messages.trunfo.deckSelection}</span>
+          <div className="trunfo-difficulty-grid">
+            {deckSelections.map((selection) => {
+              const Icon = selection.icon;
+
+              return (
+                <button
+                  className={setup.deckSelection === selection.value ? 'trunfo-difficulty trunfo-difficulty--active' : 'trunfo-difficulty'}
+                  key={selection.value}
+                  onClick={() => onChange({ ...setup, deckSelection: selection.value })}
+                >
+                  <strong><Icon size={15} /> {selection.label}</strong>
+                  <small>{selection.description}</small>
+                </button>
+              );
+            })}
           </div>
         </div>
 

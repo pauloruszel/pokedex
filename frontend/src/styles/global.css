@@ -434,6 +434,92 @@ h2 { margin: 0; color: #fff; letter-spacing: -0.05em; }
 .trunfo-difficulty small { color: inherit; opacity: .74; line-height: 1.35; }
 .trunfo-start-button { width: 100%; min-height: 52px; }
 
+.trunfo-draft {
+  display: grid;
+  gap: 16px;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: rgba(255,255,255,.08);
+  box-shadow: 0 24px 80px rgba(0,0,0,.24);
+  padding: 18px;
+}
+.trunfo-draft-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.trunfo-draft-header h2 { margin: 10px 0 8px; color: #fff; font-size: clamp(1.8rem, 3vw, 3rem); }
+.trunfo-draft-header p { max-width: 760px; margin: 0; color: var(--text-soft); line-height: 1.6; }
+.trunfo-draft-header > strong {
+  color: #101729;
+  background: #fff;
+  border-radius: 999px;
+  padding: 10px 14px;
+  white-space: nowrap;
+}
+.trunfo-draft-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255,255,255,.08);
+  padding: 0 12px;
+}
+.trunfo-draft-search input {
+  width: 100%;
+  min-height: 46px;
+  border: 0;
+  outline: 0;
+  color: #fff;
+  background: transparent;
+}
+.trunfo-draft-search input::placeholder { color: var(--text-soft); }
+.trunfo-draft-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 10px;
+}
+.trunfo-draft-card {
+  position: relative;
+  min-height: 210px;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  color: #fff;
+  background: rgba(255,255,255,.07);
+  padding: 12px;
+  text-align: center;
+}
+.trunfo-draft-card:disabled { opacity: .42; cursor: not-allowed; }
+.trunfo-draft-card--selected { border-color: rgba(110,231,255,.72); box-shadow: 0 0 0 1px rgba(110,231,255,.25); }
+.trunfo-draft-card img { width: 84px; height: 84px; object-fit: contain; filter: drop-shadow(0 14px 12px rgba(0,0,0,.25)); }
+.trunfo-draft-card strong { font-size: .95rem; }
+.trunfo-draft-card small { color: var(--text-soft); font-weight: 900; }
+.trunfo-draft-check {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255,255,255,.08);
+}
+.trunfo-draft-card--selected .trunfo-draft-check { color: #101729; background: #6ee7ff; border-color: #6ee7ff; }
+.trunfo-draft-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .trunfo-game-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
 .trunfo-battle { padding: 16px; box-shadow: 0 24px 80px rgba(0,0,0,.24); }
 .trunfo-scoreboard {
@@ -539,6 +625,20 @@ h2 { margin: 0; color: #fff; letter-spacing: -0.05em; }
 .trunfo-crown { position: absolute; top: 12px; right: calc(50% - 92px); color: #ffd66e; filter: drop-shadow(0 0 12px rgba(255,214,110,.42)); }
 .trunfo-card-title { flex-direction: column; gap: 7px; text-align: center; margin-bottom: 10px; }
 .trunfo-card-title h3 { margin: 0; color: #fff; font-size: 1.32rem; letter-spacing: -0.02em; }
+.trunfo-card-power {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 2px 10px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 14px;
+  background: rgba(255,255,255,.08);
+  padding: 8px 10px;
+}
+.trunfo-card-power span, .trunfo-card-power small { color: var(--text-soft); font-weight: 900; }
+.trunfo-card-power strong { grid-row: span 2; color: #fff; font-size: 1.28rem; }
+.trunfo-card-power small { font-size: .75rem; }
 .trunfo-attribute-list { display: grid; gap: 6px; }
 .trunfo-attribute-row {
   justify-content: space-between;
@@ -634,6 +734,7 @@ h2 { margin: 0; color: #fff; letter-spacing: -0.05em; }
 }
 .trunfo-history-item span { color: var(--text-muted); font-size: .78rem; font-weight: 900; }
 .trunfo-history-item strong { color: #fff; }
+.trunfo-history-item mark { width: fit-content; color: #101729; background: #fff; border-radius: 999px; padding: 3px 7px; font-size: .72rem; font-weight: 950; }
 .trunfo-history-item small { color: var(--text-soft); line-height: 1.4; }
 .trunfo-history-item em { color: #ffe6a6; font-size: .78rem; font-style: normal; font-weight: 900; }
 .trunfo-history-item--player { border-color: rgba(110,231,255,.34); }
@@ -686,6 +787,7 @@ h2 { margin: 0; color: #fff; letter-spacing: -0.05em; }
   .hero-panel--game p { display: block; }
   .trunfo-page { margin-top: 18px; }
   .trunfo-setup, .trunfo-game-layout, .trunfo-table { grid-template-columns: 1fr; }
+  .trunfo-draft-header { flex-direction: column; }
   .trunfo-history { position: static; }
   .trunfo-scoreboard { grid-template-columns: 1fr; }
   .trunfo-round-pill { text-align: center; }
@@ -705,6 +807,9 @@ h2 { margin: 0; color: #fff; letter-spacing: -0.05em; }
   .trunfo-setup { padding: 12px; }
   .trunfo-setup-copy, .trunfo-setup-panel, .trunfo-battle, .trunfo-history { border-radius: 20px; }
   .trunfo-difficulty-grid, .trunfo-segmented { grid-template-columns: 1fr; }
+  .trunfo-draft { padding: 12px; border-radius: 20px; }
+  .trunfo-draft-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .trunfo-draft-actions .primary-control, .trunfo-draft-actions .secondary-control { width: 100%; }
   .trunfo-card { min-height: 462px; border-radius: 24px; }
   .trunfo-attribute-picker { grid-template-columns: repeat(2, 1fr); }
 }
