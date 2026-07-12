@@ -25,9 +25,10 @@ Use este contrato para qualquer sessão de agente neste repositório.
 Quando houver `graphify-out/`, tratar o grafo como fonte auxiliar, não como verdade absoluta.
 
 - Ler `graphify-out/GRAPH_REPORT.md` para perguntas arquiteturais.
+- Para reduzir custo, ler só as seções necessárias: Summary, God Nodes, Communities e Suggested Questions.
 - Confirmar relações inferidas no código antes de refatorar.
 - Para refatoração de código, registrar baseline antes de editar: commit, comunidade, coesão e god nodes.
-- Depois de refatorações relevantes, rodar:
+- Se a tarefa nasceu de Graphify ou tem objetivo arquitetural, rodar Graphify depois da mudança, salvo pedido explícito para não rodar:
 
 ```powershell
 & "$(Get-Content graphify-out/.graphify_python)" -m graphify . --update
@@ -38,3 +39,13 @@ Quando houver `graphify-out/`, tratar o grafo como fonte auxiliar, não como ver
 ## Prompts e specs
 
 Usar `docs/prompt-playbook.md` como referência para formatar pedidos com objetivo, contexto, escopo, restrições, validação e entrega.
+
+## Fechamento obrigatório
+
+Ao finalizar tarefa de código, informar:
+
+- working tree inicial relevante;
+- arquivos alterados;
+- validação executada;
+- comandos que não foram executados e motivo;
+- se era refatoração arquitetural, comparação Graphify antes/depois ou motivo para não rodar.

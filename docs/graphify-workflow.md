@@ -35,6 +35,8 @@ Use este workflow para análise arquitetural, coesão, comunidades e refatoraç�
 - Tratar docs e wiki como ruído quando o objetivo for coesão de código.
 - Não perseguir coesão baixa causada principalmente por annotations, configs ou package metadata.
 - Parar quando o menor corte seguro for validado, mesmo que a coesão continue baixa por ruído de framework.
+- Se a tarefa nasceu do Graphify ou tem objetivo arquitetural, rodar update, cluster e label depois da mudança, salvo pedido explícito para não rodar.
+- No fechamento, mostrar comparação antes/depois ou explicar por que Graphify não foi executado.
 
 ## Prompt modelo
 
@@ -60,4 +62,5 @@ Entrega:
 - Implementação se o plano for direto.
 - Validação.
 - Comparação antes/depois quando Graphify for atualizado.
+- Comandos não executados e motivo.
 ```

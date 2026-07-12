@@ -17,12 +17,15 @@ Use esta spec quando a tarefa pedir refatoração.
 5. Evitar novas abstrações sem ganho claro.
 6. Parar quando o menor corte seguro estiver validado.
 7. Validar com o menor comando confiável.
+8. Fechar a tarefa com arquivos alterados, validação e pendências explícitas.
 
 ## Se usar Graphify
 
 - Registrar baseline antes de editar: commit, comunidade, coesão e god nodes.
+- Ler só as seções necessárias do relatório para reduzir custo: Summary, God Nodes, Communities e Suggested Questions.
 - Ignorar baixa coesão causada principalmente por annotations, configs, package metadata ou documentação.
 - Confirmar no código qualquer acoplamento sugerido pelo grafo.
+- Se a refatoração nasceu do Graphify, rodar update, cluster e label depois da mudança, salvo pedido explícito para não rodar.
 - Comparar antes/depois apenas depois de rodar update, cluster e label.
 
 ## Saída esperada
@@ -30,6 +33,7 @@ Use esta spec quando a tarefa pedir refatoração.
 - Código alterado.
 - Arquivos tocados.
 - Validação executada.
+- Comandos não executados e motivo.
 - Comparação Graphify antes/depois, se aplicável.
 - O que foi deliberadamente deixado de fora.
 
