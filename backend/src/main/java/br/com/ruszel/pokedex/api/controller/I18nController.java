@@ -1,5 +1,7 @@
 package br.com.ruszel.pokedex.api.controller;
 
+import br.com.ruszel.pokedex.application.usecase.TranslationRequest;
+import br.com.ruszel.pokedex.application.usecase.TranslationResult;
 import br.com.ruszel.pokedex.application.usecase.TranslateTextUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -26,8 +28,8 @@ public class I18nController {
             summary = "Traduz texto sob demanda",
             description = "Traduz um texto entre locales e reutiliza o cache de traduções quando já houver uma tradução válida."
     )
-    @ApiResponse(responseCode = "200", description = "Tradução processada", content = @Content(schema = @Schema(implementation = TranslateTextUseCase.TranslationResult.class)))
-    public Mono<TranslateTextUseCase.TranslationResult> translate(@RequestBody TranslateTextUseCase.TranslationRequest request) {
+    @ApiResponse(responseCode = "200", description = "Tradução processada", content = @Content(schema = @Schema(implementation = TranslationResult.class)))
+    public Mono<TranslationResult> translate(@RequestBody TranslationRequest request) {
         return Mono.fromCallable(() -> translateTextUseCase.execute(request))
                 .subscribeOn(Schedulers.boundedElastic());
     }

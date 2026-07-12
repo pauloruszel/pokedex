@@ -46,7 +46,7 @@ class TranslateTextUseCaseTest {
                 gatewayReturning(Optional.empty())
         );
 
-        TranslateTextUseCase.TranslationResult result = useCase.execute(new TranslateTextUseCase.TranslationRequest(
+        TranslationResult result = useCase.execute(new TranslationRequest(
                 "Texto em português",
                 "pt-BR",
                 "es",
@@ -67,7 +67,7 @@ class TranslateTextUseCaseTest {
                 gatewayReturning(Optional.of("Texto en español"))
         );
 
-        TranslateTextUseCase.TranslationResult result = useCase.execute(new TranslateTextUseCase.TranslationRequest(
+        TranslationResult result = useCase.execute(new TranslationRequest(
                 "Texto em português",
                 "pt-BR",
                 "es",
