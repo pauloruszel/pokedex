@@ -32,11 +32,39 @@ Use este workflow para análise arquitetural, coesão, comunidades e refatoraç�
 
 - Registrar baseline antes de editar: commit, comunidade, coesão e god nodes.
 - Ler só as seções necessárias do relatório: Summary, God Nodes, Communities e Suggested Questions.
+- Usar comandos de leitura seletiva; não despejar o `GRAPH_REPORT.md` inteiro no contexto.
 - Tratar docs e wiki como ruído quando o objetivo for coesão de código.
 - Não perseguir coesão baixa causada principalmente por annotations, configs ou package metadata.
 - Parar quando o menor corte seguro for validado, mesmo que a coesão continue baixa por ruído de framework.
 - Se a tarefa nasceu do Graphify ou tem objetivo arquitetural, rodar update, cluster e label depois da mudança, salvo pedido explícito para não rodar.
 - No fechamento, mostrar comparação antes/depois ou explicar por que Graphify não foi executado.
+
+## Baseline curta
+
+Use `rg` para localizar metadados gerais:
+
+```powershell
+rg "Built from commit|## Summary|## God Nodes|Suggested Questions" graphify-out\GRAPH_REPORT.md -n -C 2
+```
+
+Para um módulo específico, prefira imprimir apenas o bloco da comunidade:
+
+```powershell
+$lines = Get-Content -Encoding UTF8 graphify-out\GRAPH_REPORT.md
+$start = ($lines | Select-String '### Community .*NOME_DO_MODULO').LineNumber
+if ($start) { $lines[($start-1)..([Math]::Min($start+2, $lines.Length-1))] }
+```
+
+Para god nodes, limite a seção:
+
+```powershell
+$lines = Get-Content -Encoding UTF8 graphify-out\GRAPH_REPORT.md
+$start = ($lines | Select-String '## God Nodes').LineNumber
+if ($start) { $lines[($start-1)..([Math]::Min($start+10, $lines.Length-1))] }
+```
+
+Evite padrões genéricos como `Cohesion` sem restringir a comunidade: eles retornam quase todas as comunidades do relatório.
+Evite `Select-String -InputObject $lines -Context ...` com arrays grandes: no PowerShell isso pode retornar blocos enormes e gastar contexto sem necessidade.
 
 ## Prompt modelo
 
@@ -55,6 +83,7 @@ Restrições:
 - Não mexer em módulos fora do escopo.
 - Priorizar deleção, extração simples ou mover função existente.
 - Registrar baseline antes de editar.
+- Usar baseline curta do Graphify.
 
 Entrega:
 - Diagnóstico.

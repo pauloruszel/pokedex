@@ -23,6 +23,7 @@ Use esta spec quando a tarefa pedir refatoração.
 
 - Registrar baseline antes de editar: commit, comunidade, coesão e god nodes.
 - Ler só as seções necessárias do relatório para reduzir custo: Summary, God Nodes, Communities e Suggested Questions.
+- Usar baseline curta do `docs/graphify-workflow.md`; não carregar o relatório inteiro.
 - Ignorar baixa coesão causada principalmente por annotations, configs, package metadata ou documentação.
 - Confirmar no código qualquer acoplamento sugerido pelo grafo.
 - Se a refatoração nasceu do Graphify, rodar update, cluster e label depois da mudança, salvo pedido explícito para não rodar.
