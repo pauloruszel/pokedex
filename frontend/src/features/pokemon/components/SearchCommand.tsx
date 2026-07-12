@@ -1,6 +1,6 @@
 import { Filter, Search, SlidersHorizontal, X } from 'lucide-react';
 import { TypeBadge } from '../../../shared/components/TypeBadge';
-import { useI18n } from '../../../shared/i18n/I18nProvider';
+import type { Messages } from '../../../shared/i18n/messages';
 
 type Props = {
   search: string;
@@ -10,13 +10,12 @@ type Props = {
   onSubmit: () => void;
   onTypeChange: (type: string) => void;
   onClear: () => void;
+  messages: Pick<Messages, 'search' | 'types'>;
 };
 
 const quickTypes = ['fire', 'water', 'grass', 'electric', 'dragon', 'ghost'];
 
-export function SearchCommand({ search, selectedType, types, onSearchChange, onSubmit, onTypeChange, onClear }: Props) {
-  const { messages } = useI18n();
-
+export function SearchCommand({ search, selectedType, types, onSearchChange, onSubmit, onTypeChange, onClear, messages }: Props) {
   return (
     <section className="command-center">
       <div className="search-command">
@@ -37,7 +36,7 @@ export function SearchCommand({ search, selectedType, types, onSearchChange, onS
         <span><Filter size={16} /> {messages.search.quickTypes}</span>
         {quickTypes.map((type) => (
           <button className={selectedType === type ? 'chip-button chip-button--active' : 'chip-button'} key={type} onClick={() => onTypeChange(type)}>
-            <TypeBadge type={type} compact />
+            <TypeBadge type={type} label={messages.types[type as keyof typeof messages.types]} compact />
           </button>
         ))}
         <label className="select-shell">

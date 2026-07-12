@@ -1,12 +1,12 @@
 import { Crown, HelpCircle, ShieldQuestion, Sparkles } from 'lucide-react';
 import type { CSSProperties } from 'react';
 import { TypeBadge } from '../../../shared/components/TypeBadge';
-import { useI18n } from '../../../shared/i18n/I18nProvider';
+import { useMessages } from '../../../shared/i18n/I18nProvider';
 import { assetUrl } from '../../../shared/utils/assets';
 import { formatPokemonName, formatPokemonNumber } from '../../../shared/utils/format';
 import { getTypeTheme } from '../../../shared/utils/typeTheme';
-import type { TrunfoAttributeKey, TrunfoCardModel } from '../types/trunfo';
-import { ATTRIBUTE_OPTIONS, formatAttributeValue, getAttributeShortLabel, getRarityLabel } from '../utils/trunfoRules';
+import type { TrunfoAttributeKey, TrunfoCardModel } from '../types/trunfoCard';
+import { ATTRIBUTE_OPTIONS, formatAttributeValue, getAttributeShortLabel, getRarityLabel } from '../utils/trunfoAttributes';
 
 type Props = {
   card: TrunfoCardModel | null;
@@ -17,7 +17,7 @@ type Props = {
 };
 
 export function TrunfoCard({ card, side, isHidden = false, selectedAttribute, winningAttribute }: Props) {
-  const { messages } = useI18n();
+  const messages = useMessages();
 
   if (!card || isHidden) {
     return (
@@ -53,7 +53,7 @@ export function TrunfoCard({ card, side, isHidden = false, selectedAttribute, wi
       <div className="trunfo-card-title">
         <h3>{formatPokemonName(card.summary.name)}</h3>
         <div className="type-list">
-          {card.summary.types.map((type) => <TypeBadge key={type} type={type} compact />)}
+          {card.summary.types.map((type) => <TypeBadge key={type} type={type} label={messages.types[type as keyof typeof messages.types]} compact />)}
         </div>
       </div>
 

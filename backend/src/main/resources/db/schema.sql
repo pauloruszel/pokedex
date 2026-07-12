@@ -43,8 +43,20 @@ CREATE TABLE IF NOT EXISTS pokemon_text_translation (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+ALTER TABLE pokemon_text_translation ADD COLUMN IF NOT EXISTS source_locale VARCHAR(20);
+ALTER TABLE pokemon_text_translation ADD COLUMN IF NOT EXISTS target_locale VARCHAR(20);
+ALTER TABLE pokemon_text_translation ADD COLUMN IF NOT EXISTS text_hash VARCHAR(80);
+ALTER TABLE pokemon_text_translation ADD COLUMN IF NOT EXISTS entity_type VARCHAR(40);
+ALTER TABLE pokemon_text_translation ADD COLUMN IF NOT EXISTS entity_id VARCHAR(120);
+
 CREATE INDEX IF NOT EXISTS idx_pokemon_text_translation_lookup
     ON pokemon_text_translation(text_kind, locale);
+
+CREATE INDEX IF NOT EXISTS idx_pokemon_text_translation_locale_hash
+    ON pokemon_text_translation(text_kind, source_locale, target_locale, text_hash);
+
+CREATE INDEX IF NOT EXISTS idx_pokemon_text_translation_entity
+    ON pokemon_text_translation(entity_type, entity_id, target_locale);
 
 CREATE TABLE IF NOT EXISTS translation_job_status (
     job_name VARCHAR(80) PRIMARY KEY,

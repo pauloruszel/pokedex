@@ -1,6 +1,6 @@
 import { ChevronLeft, ChevronRight, SearchX } from 'lucide-react';
 import { PokemonGridSkeleton } from '../../../shared/components/Skeleton';
-import { useI18n } from '../../../shared/i18n/I18nProvider';
+import { useMessages } from '../../../shared/i18n/I18nProvider';
 import { PokemonCard } from '../components/PokemonCard';
 import { SearchCommand } from '../components/SearchCommand';
 import type { PokemonSummary } from '../types/pokemon';
@@ -50,7 +50,7 @@ export function PokedexPage({
   onToggleFavorite,
   onToggleCompare
 }: Props) {
-  const { messages } = useI18n();
+  const messages = useMessages();
   const currentPage = Math.floor(offset / pageSize) + 1;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
@@ -64,6 +64,7 @@ export function PokedexPage({
         onSubmit={onSearchSubmit}
         onClear={onClearSearch}
         onTypeChange={onTypeChange}
+        messages={messages}
       />
 
       <section className="section-heading">
@@ -96,6 +97,7 @@ export function PokedexPage({
               onPrefetch={onPrefetch}
               onToggleFavorite={onToggleFavorite}
               onToggleCompare={onToggleCompare}
+              messages={messages}
             />
           ))}
         </section>

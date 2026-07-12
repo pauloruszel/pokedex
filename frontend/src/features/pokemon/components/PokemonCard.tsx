@@ -1,7 +1,7 @@
 import { Heart, Plus, Search } from 'lucide-react';
 import type { CSSProperties, MouseEvent } from 'react';
 import { TypeBadge } from '../../../shared/components/TypeBadge';
-import { useI18n } from '../../../shared/i18n/I18nProvider';
+import type { Messages } from '../../../shared/i18n/messages';
 import { assetUrl } from '../../../shared/utils/assets';
 import { formatPokemonName, formatPokemonNumber } from '../../../shared/utils/format';
 import { getTypeTheme } from '../../../shared/utils/typeTheme';
@@ -15,10 +15,10 @@ type Props = {
   onPrefetch: (pokemon: PokemonSummary) => void;
   onToggleFavorite: (pokemon: PokemonSummary) => void;
   onToggleCompare: (pokemon: PokemonSummary) => void;
+  messages: Pick<Messages, 'card' | 'types'>;
 };
 
-export function PokemonCard({ pokemon, isFavorite, isCompared, onOpen, onPrefetch, onToggleFavorite, onToggleCompare }: Props) {
-  const { messages } = useI18n();
+export function PokemonCard({ pokemon, isFavorite, isCompared, onOpen, onPrefetch, onToggleFavorite, onToggleCompare, messages }: Props) {
   const theme = getTypeTheme(pokemon.types);
 
   function handleFavorite(event: MouseEvent<HTMLButtonElement>) {
@@ -58,7 +58,7 @@ export function PokemonCard({ pokemon, isFavorite, isCompared, onOpen, onPrefetc
       <div className="card-content">
         <h3>{formatPokemonName(pokemon.name)}</h3>
         <div className="type-list">
-          {pokemon.types.map((type) => <TypeBadge type={type} compact key={type} />)}
+          {pokemon.types.map((type) => <TypeBadge type={type} label={messages.types[type as keyof typeof messages.types]} compact key={type} />)}
         </div>
       </div>
 

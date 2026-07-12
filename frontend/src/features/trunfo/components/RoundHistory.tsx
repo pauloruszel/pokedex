@@ -1,15 +1,16 @@
 import { History } from 'lucide-react';
-import { useI18n } from '../../../shared/i18n/I18nProvider';
+import { useI18nFormat, useMessages } from '../../../shared/i18n/I18nProvider';
 import { formatPokemonName } from '../../../shared/utils/format';
-import type { RoundHistoryItem } from '../types/trunfo';
-import { formatAttributeValue, getAttributeLabel } from '../utils/trunfoRules';
+import type { RoundHistoryItem } from '../types/trunfoGame';
+import { formatAttributeValue, getAttributeLabel } from '../utils/trunfoAttributes';
 
 type Props = {
   history: RoundHistoryItem[];
 };
 
 export function RoundHistory({ history }: Props) {
-  const { messages, format } = useI18n();
+  const messages = useMessages();
+  const format = useI18nFormat();
 
   return (
     <aside className="trunfo-history">

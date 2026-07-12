@@ -1,5 +1,5 @@
 import { Heart, Trash2 } from 'lucide-react';
-import { useI18n } from '../../shared/i18n/I18nProvider';
+import { useMessages } from '../../shared/i18n/I18nProvider';
 import { PokemonCard } from '../pokemon/components/PokemonCard';
 import type { PokemonSummary } from '../pokemon/types/pokemon';
 
@@ -14,7 +14,7 @@ type Props = {
 };
 
 export function FavoritesView({ favorites, compareIds, onOpen, onPrefetch, onToggleFavorite, onToggleCompare, onClearFavorites }: Props) {
-  const { messages } = useI18n();
+  const messages = useMessages();
 
   if (favorites.length === 0) {
     return (
@@ -49,6 +49,7 @@ export function FavoritesView({ favorites, compareIds, onOpen, onPrefetch, onTog
             onPrefetch={onPrefetch}
             onToggleFavorite={onToggleFavorite}
             onToggleCompare={onToggleCompare}
+            messages={messages}
           />
         ))}
       </section>

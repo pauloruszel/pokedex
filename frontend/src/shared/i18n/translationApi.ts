@@ -1,5 +1,5 @@
-import { API_BASE_URL } from '../utils/assets';
-import type { AppLanguage } from './messages';
+import { API_BASE_URL } from '../api/apiConfig';
+import type { AppLanguage } from './language';
 
 type TranslationResponse = {
   text: string;

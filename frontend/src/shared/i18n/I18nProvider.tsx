@@ -1,6 +1,7 @@
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
-import { getMessages, interpolate, type AppLanguage, type Messages } from './messages';
+import type { AppLanguage } from './language';
+import { getMessages, interpolate, type Messages } from './messages';
 
 type I18nContextValue = {
   language: AppLanguage;
@@ -30,4 +31,17 @@ export function useI18n() {
     throw new Error('useI18n must be used inside I18nProvider');
   }
   return context;
+}
+
+export function useMessages() {
+  return useI18n().messages;
+}
+
+export function useAppLanguage() {
+  const { language, setLanguage } = useI18n();
+  return { language, setLanguage };
+}
+
+export function useI18nFormat() {
+  return useI18n().format;
 }

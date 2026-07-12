@@ -1,6 +1,6 @@
 package br.com.ruszel.pokedex.application.usecase;
 
-import br.com.ruszel.pokedex.application.port.PokemonRepository;
+import br.com.ruszel.pokedex.application.port.PokemonTypeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -8,7 +8,7 @@ import reactor.core.publisher.Flux;
 @Service
 @RequiredArgsConstructor
 public class ListTypesUseCase {
-    private final PokemonRepository repository;
+    private final PokemonTypeRepository repository;
 
     public Flux<String> execute() {
         return repository.findTypes();
