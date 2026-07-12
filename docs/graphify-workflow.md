@@ -26,6 +26,15 @@ Use este workflow para análise arquitetural, coesão, comunidades e refatoraç�
 - God node precisa ser lido no código antes de qualquer corte.
 - Arestas `INFERRED` precisam de confirmação manual.
 - Comunidades com annotations Spring podem parecer menos coesas sem indicar problema real.
+- Package metadata, configs e documentação podem criar comunidades ruidosas; não usar isso sozinho como gatilho de refatoração.
+
+## Para refatoração de código
+
+- Registrar baseline antes de editar: commit, comunidade, coesão e god nodes.
+- Ler só as seções necessárias do relatório: Summary, God Nodes, Communities e Suggested Questions.
+- Tratar docs e wiki como ruído quando o objetivo for coesão de código.
+- Não perseguir coesão baixa causada principalmente por annotations, configs ou package metadata.
+- Parar quando o menor corte seguro for validado, mesmo que a coesão continue baixa por ruído de framework.
 
 ## Prompt modelo
 
@@ -43,11 +52,12 @@ Restrições:
 - Confirmar no código antes de alterar.
 - Não mexer em módulos fora do escopo.
 - Priorizar deleção, extração simples ou mover função existente.
+- Registrar baseline antes de editar.
 
 Entrega:
 - Diagnóstico.
 - Plano mínimo.
 - Implementação se o plano for direto.
 - Validação.
+- Comparação antes/depois quando Graphify for atualizado.
 ```
-

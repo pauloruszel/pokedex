@@ -15,13 +15,22 @@ Use esta spec quando a tarefa pedir refatoração.
 3. Se a motivação veio do Graphify, confirmar no código se o acoplamento é real.
 4. Fazer o menor corte que melhora o problema.
 5. Evitar novas abstrações sem ganho claro.
-6. Validar com o menor comando confiável.
+6. Parar quando o menor corte seguro estiver validado.
+7. Validar com o menor comando confiável.
+
+## Se usar Graphify
+
+- Registrar baseline antes de editar: commit, comunidade, coesão e god nodes.
+- Ignorar baixa coesão causada principalmente por annotations, configs, package metadata ou documentação.
+- Confirmar no código qualquer acoplamento sugerido pelo grafo.
+- Comparar antes/depois apenas depois de rodar update, cluster e label.
 
 ## Saída esperada
 
 - Código alterado.
 - Arquivos tocados.
 - Validação executada.
+- Comparação Graphify antes/depois, se aplicável.
 - O que foi deliberadamente deixado de fora.
 
 ## Prompt modelo
@@ -41,8 +50,8 @@ Restrições:
 - Menor mudança segura.
 - Sem dependência nova.
 - Sem alterar contrato público.
+- Parar quando o menor corte seguro estiver validado.
 
 Validação:
 [comandos]
 ```
-

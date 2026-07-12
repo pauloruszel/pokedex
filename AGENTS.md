@@ -10,6 +10,7 @@ Use este contrato para qualquer sessão de agente neste repositório.
 - Não adicionar dependência sem justificativa objetiva.
 - Corrigir causa raiz, não só o sintoma.
 - Não alterar contrato público sem atualizar frontend, backend, Swagger e docs afetadas.
+- Antes de editar, verificar o working tree e não misturar mudanças não relacionadas.
 - Preservar mudanças não relacionadas feitas pelo usuário.
 
 ## Validação
@@ -25,6 +26,7 @@ Quando houver `graphify-out/`, tratar o grafo como fonte auxiliar, não como ver
 
 - Ler `graphify-out/GRAPH_REPORT.md` para perguntas arquiteturais.
 - Confirmar relações inferidas no código antes de refatorar.
+- Para refatoração de código, registrar baseline antes de editar: commit, comunidade, coesão e god nodes.
 - Depois de refatorações relevantes, rodar:
 
 ```powershell
@@ -36,4 +38,3 @@ Quando houver `graphify-out/`, tratar o grafo como fonte auxiliar, não como ver
 ## Prompts e specs
 
 Usar `docs/prompt-playbook.md` como referência para formatar pedidos com objetivo, contexto, escopo, restrições, validação e entrega.
-
