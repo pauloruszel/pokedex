@@ -10,6 +10,7 @@ Aplicação full stack de Pokédex com **backend Java/Spring Boot** e **frontend
 - [Build e testes](#build-e-testes)
 - [Arquitetura](#arquitetura)
 - [Endpoints](#endpoints)
+- [Swagger / OpenAPI](#swagger--openapi)
 - [Configurações](#configurações)
 - [Cache e dados](#cache-e-dados)
 - [Tradução pt-BR](#tradução-pt-br)
@@ -171,6 +172,24 @@ X-Admin-Token: local-dev-token
 GET /actuator/health
 GET /actuator/metrics
 ```
+
+## Swagger / OpenAPI
+
+Com o backend em execução, acesse:
+
+| Recurso | URL |
+| --- | --- |
+| Swagger UI | <http://localhost:8080/swagger-ui.html> |
+| OpenAPI JSON | <http://localhost:8080/v3/api-docs> |
+
+A documentação está em pt-BR e cobre:
+
+- descrição geral da API;
+- grupos por domínio: Pokémon, imagens, Trunfo, i18n e administração;
+- parâmetros de path/query;
+- exemplos de entrada e saída;
+- schemas dos modelos principais;
+- autenticação por `X-Admin-Token` nos endpoints administrativos.
 
 ## Configurações
 

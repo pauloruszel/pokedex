@@ -1,5 +1,6 @@
 package br.com.ruszel.pokedex.application.usecase;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
@@ -109,9 +110,19 @@ public class TranslationCacheService {
         return new CleanupResult(deleted);
     }
 
-    public record CachedTranslation(String translatedText, String translationSource) {
+    @Schema(description = "Tradução recuperada do cache.")
+    public record CachedTranslation(
+            @Schema(description = "Texto traduzido salvo.", example = "Um Pokémon rato elétrico.")
+            String translatedText,
+            @Schema(description = "Origem da tradução salva.", example = "external-provider")
+            String translationSource
+    ) {
     }
 
-    public record CleanupResult(int deleted) {
+    @Schema(description = "Resultado da limpeza de cache de traduções inválidas.")
+    public record CleanupResult(
+            @Schema(description = "Quantidade de registros removidos.", example = "12")
+            int deleted
+    ) {
     }
 }

@@ -1,5 +1,6 @@
 package br.com.ruszel.pokedex.application.usecase;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
@@ -101,15 +102,25 @@ public class TranslationJobStatusService {
         return value.substring(0, 1000);
     }
 
+    @Schema(description = "Status persistido do job de manutenção de traduções.")
     public record TranslationJobStatus(
+            @Schema(description = "Nome do job.", example = "translation-refresh")
             String jobName,
+            @Schema(description = "Estado atual do job.", example = "RUNNING")
             String status,
+            @Schema(description = "Total de itens planejados.", example = "2000")
             int total,
+            @Schema(description = "Quantidade já processada.", example = "120")
             int processed,
+            @Schema(description = "Quantidade de falhas.", example = "3")
             int failures,
+            @Schema(description = "Último erro registrado, se existir.")
             String lastError,
+            @Schema(description = "Início do job.")
             Instant startedAt,
+            @Schema(description = "Última atualização do job.")
             Instant updatedAt,
+            @Schema(description = "Fim do job, quando concluído.")
             Instant finishedAt
     ) {
     }
