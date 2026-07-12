@@ -24,3 +24,6 @@ backend/data/
 *.tsbuildinfo
 translation-refresh*.json
 missing-translations*.json
+
+# Generated architecture graph
+graphify-out/
