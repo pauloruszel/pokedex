@@ -1,0 +1,48 @@
+# Contrato de refatoração
+
+Use esta spec quando a tarefa pedir refatoração.
+
+## Entrada mínima
+
+- Módulo, arquivo ou fluxo alvo.
+- Sintoma: coesão baixa, god node, teste difícil, bug, duplicação ou acoplamento.
+- Restrições: o que não pode mudar.
+
+## Processo
+
+1. Ler os arquivos diretamente afetados.
+2. Buscar callers e imports do ponto alterado.
+3. Se a motivação veio do Graphify, confirmar no código se o acoplamento é real.
+4. Fazer o menor corte que melhora o problema.
+5. Evitar novas abstrações sem ganho claro.
+6. Validar com o menor comando confiável.
+
+## Saída esperada
+
+- Código alterado.
+- Arquivos tocados.
+- Validação executada.
+- O que foi deliberadamente deixado de fora.
+
+## Prompt modelo
+
+```text
+Objetivo:
+Refatorar [módulo/fluxo] para [resultado].
+
+Contexto:
+[Graphify, bug, dor de teste ou acoplamento observado]
+
+Escopo:
+- Pode mexer em: [...]
+- Não mexer em: [...]
+
+Restrições:
+- Menor mudança segura.
+- Sem dependência nova.
+- Sem alterar contrato público.
+
+Validação:
+[comandos]
+```
+
