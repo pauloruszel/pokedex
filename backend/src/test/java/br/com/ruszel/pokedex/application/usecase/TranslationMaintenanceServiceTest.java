@@ -68,7 +68,7 @@ class TranslationMaintenanceServiceTest {
 
         JdbcClient jdbcClient = JdbcClient.create(dataSource);
         TranslationJobStatusService statusService = new TranslationJobStatusService(jdbcClient);
-        service = new TranslationMaintenanceService(jdbcClient, refreshingRepository(), statusService, new TranslationCacheService(jdbcClient));
+        service = new TranslationMaintenanceService(new TranslationMaintenanceQueries(jdbcClient), refreshingRepository(), statusService, new TranslationCacheService(jdbcClient));
     }
 
     @Test

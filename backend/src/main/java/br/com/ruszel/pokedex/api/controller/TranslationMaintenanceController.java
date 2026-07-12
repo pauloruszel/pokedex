@@ -2,7 +2,6 @@ package br.com.ruszel.pokedex.api.controller;
 
 import br.com.ruszel.pokedex.config.OpenApiConfig;
 import br.com.ruszel.pokedex.application.usecase.TranslationMaintenanceService;
-import br.com.ruszel.pokedex.application.usecase.TranslationCacheService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -59,7 +58,7 @@ public class TranslationMaintenanceController {
             summary = "Remove traduções inválidas do cache",
             description = "Apaga entradas de cache que não devem ser reutilizadas, como traduções vazias ou equivalentes ao texto original."
     )
-    public TranslationCacheService.CleanupResult cleanupInvalidCache() {
+    public TranslationMaintenanceService.CleanupResult cleanupInvalidCache() {
         return translationMaintenanceService.cleanupInvalidCache();
     }
 }
