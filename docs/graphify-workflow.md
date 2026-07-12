@@ -65,6 +65,15 @@ if ($start) { $lines[($start-1)..([Math]::Min($start+10, $lines.Length-1))] }
 
 Evite padrões genéricos como `Cohesion` sem restringir a comunidade: eles retornam quase todas as comunidades do relatório.
 Evite `Select-String -InputObject $lines -Context ...` com arrays grandes: no PowerShell isso pode retornar blocos enormes e gastar contexto sem necessidade.
+Prefira comandos PowerShell simples quando houver aspas ou regex; se um comando de inspeção falhar por escaping, repita com uma forma menor e registre a falha no fechamento.
+
+## Decisão final
+
+Ao fechar uma análise Graphify, declare uma destas opções:
+
+- Refatorar agora: há acoplamento real confirmado no código.
+- Não refatorar: baixa coesão é ruído de framework, config, metadata ou docs.
+- Adiar: há sinal real, mas sem dor concreta ou sem menor corte seguro.
 
 ## Prompt modelo
 
@@ -87,6 +96,7 @@ Restrições:
 
 Entrega:
 - Diagnóstico.
+- Decisão final: refatorar agora, não refatorar ou adiar.
 - Plano mínimo.
 - Implementação se o plano for direto.
 - Validação.
