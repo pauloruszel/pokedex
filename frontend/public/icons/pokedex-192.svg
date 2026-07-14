@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" role="img" aria-label="Pokedex">
+  <rect width="192" height="192" rx="44" fill="#070b15"/>
+  <circle cx="96" cy="96" r="64" fill="#ffffff"/>
+  <path d="M32 96a64 64 0 0 1 128 0H32Z" fill="#ff3d5a"/>
+  <path d="M32 96h128" stroke="#101729" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="96" cy="96" r="24" fill="#ffffff" stroke="#101729" stroke-width="10"/>
+  <circle cx="96" cy="96" r="9" fill="#6ee7ff"/>
+</svg>

@@ -796,8 +796,13 @@ h2 { margin: 0; color: #fff; letter-spacing: -0.05em; }
 
 @media (max-width: 560px) {
   h1 { font-size: 2.75rem; }
+  .app-shell { width: min(100% - 18px, 1260px); padding-bottom: 88px; }
+  .hero-panel { min-height: 390px; }
+  .hero-content { margin-top: 42px; }
   .brand-mark { width: 100%; justify-content: center; }
-  .nav-pill { flex: 1; justify-content: center; }
+  .nav-actions { width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .nav-pill { min-height: 44px; justify-content: center; padding-inline: 10px; }
+  .language-switcher { grid-column: 1 / -1; justify-content: center; }
   .pokemon-grid { grid-template-columns: 1fr; }
   .pagination { flex-direction: column; }
   .detail-hero h2 { font-size: 3rem; }
@@ -812,4 +817,12 @@ h2 { margin: 0; color: #fff; letter-spacing: -0.05em; }
   .trunfo-draft-actions .primary-control, .trunfo-draft-actions .secondary-control { width: 100%; }
   .trunfo-card { min-height: 462px; border-radius: 24px; }
   .trunfo-attribute-picker { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (display-mode: standalone) {
+  .app-shell { padding-top: max(10px, env(safe-area-inset-top)); }
+  .hero-panel { min-height: 340px; }
+  .hero-content { margin-top: 34px; }
+  .hero-panel--game { min-height: 240px; }
+  .command-center { margin-top: -34px; }
 }
