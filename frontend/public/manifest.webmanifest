@@ -1,7 +1,7 @@
 {
-  "name": "Ruszel Pokedex",
-  "short_name": "Pokedex",
-  "description": "Pokedex com exploracao, favoritos, comparacao e modo Trunfo.",
+  "name": "PokéAtlas",
+  "short_name": "PokéAtlas",
+  "description": "Atlas Pokémon com exploracao, favoritos, comparacao e modo Trunfo.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
