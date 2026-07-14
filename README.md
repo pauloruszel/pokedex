@@ -12,6 +12,7 @@ Aplicação full stack de Pokédex com **backend Java/Spring Boot** e **frontend
 - [Endpoints](#endpoints)
 - [Swagger / OpenAPI](#swagger--openapi)
 - [Configurações](#configurações)
+- [Deploy no Railway](#deploy-no-railway)
 - [Cache e dados](#cache-e-dados)
 - [Tradução pt-BR](#tradução-pt-br)
 - [Graphify](#graphify)
@@ -83,6 +84,15 @@ npm run build
 ```
 
 O CI em `.github/workflows/build.yml` valida backend e frontend em push e pull request.
+
+## Deploy no Railway
+
+O deploy usa dois services Railway no mesmo projeto:
+
+- backend com root directory `/backend`;
+- frontend com root directory `/frontend`.
+
+Siga o passo a passo em [docs/deploy-railway.md](docs/deploy-railway.md).
 
 ## Arquitetura
 
@@ -205,6 +215,7 @@ Principais variáveis de ambiente:
 | `POKEDEX_IMAGES_STORAGE_PATH` | `./data/pokedex-images` | Diretório de imagens |
 | `POKEDEX_ADMIN_ENABLED` | `true` | Ativa endpoints admin |
 | `POKEDEX_ADMIN_TOKEN` | `local-dev-token` | Token dos endpoints admin |
+| `POKEDEX_CORS_ALLOWED_ORIGINS` | origens locais | Origens HTTP liberadas pelo backend |
 | `VITE_API_BASE_URL` | `http://localhost:8080` | URL do backend usada pelo frontend |
 
 ## Cache e dados

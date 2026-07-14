@@ -40,6 +40,7 @@ volumes:
 | `POKEDEX_IMAGES_STORAGE_PATH` | `./data/pokedex-images` | Diretório de imagens |
 | `POKEDEX_ADMIN_ENABLED` | `true` | Ativa endpoints admin |
 | `POKEDEX_ADMIN_TOKEN` | `local-dev-token` | Token admin |
+| `POKEDEX_CORS_ALLOWED_ORIGINS` | origens locais | Origens HTTP liberadas pelo backend |
 | `VITE_API_BASE_URL` | `http://localhost:8080` | URL do backend no frontend |
 
 ## LibreTranslate
@@ -51,4 +52,3 @@ docker compose --profile optional-translation up --build
 ```
 
 Se ele não estiver ativo, o backend usa os provedores configurados como fallback.
-
