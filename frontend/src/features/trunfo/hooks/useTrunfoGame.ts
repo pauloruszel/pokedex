@@ -3,6 +3,7 @@ import type { PokemonDetail, PokemonSummary } from '../../pokemon/types/pokemon'
 import { buildDeckPool, splitDeck } from '../utils/trunfoDeck';
 import { createTrunfoCard } from '../utils/trunfoCardFactory';
 import { chooseCpuAttribute, compareCards } from '../utils/trunfoRules';
+import { localWinnerLabel, nextTurnForResult } from '../utils/trunfoTurnRules';
 import type { TrunfoAttributeKey, TrunfoCardModel } from '../types/trunfoCard';
 import type {
   GameStatus,
@@ -41,9 +42,10 @@ export function useTrunfoGame() {
   const round = history.length + 1;
 
   const winner = useMemo(() => {
+    if (gameMode === 'local-pvp') return localWinnerLabel(playerDeck.length, cpuDeck.length);
     if (playerDeck.length === 0 && cpuDeck.length === 0) return 'Empate';
-    if (playerDeck.length === 0 && cpuDeck.length > 0) return gameMode === 'cpu' ? 'CPU' : 'Jogador 2';
-    if (cpuDeck.length === 0 && playerDeck.length > 0) return gameMode === 'cpu' ? 'Você' : 'Jogador 1';
+    if (playerDeck.length === 0 && cpuDeck.length > 0) return 'CPU';
+    if (cpuDeck.length === 0 && playerDeck.length > 0) return 'Você';
     return null;
   }, [cpuDeck.length, gameMode, playerDeck.length]);
 
@@ -129,18 +131,17 @@ export function useTrunfoGame() {
       setPlayerDeck([...playerRest, ...stake]);
       setCpuDeck(cpuRest);
       setDisputePile([]);
-      setCurrentTurn('player-one');
     } else if (roundResult.result === 'cpu') {
       setPlayerDeck(playerRest);
       setCpuDeck([...cpuRest, ...stake]);
       setDisputePile([]);
-      setCurrentTurn('player-two');
     } else {
       setPlayerDeck(playerRest);
       setCpuDeck(cpuRest);
       setDisputePile(stake);
     }
 
+    setCurrentTurn(nextTurnForResult(roundResult.result, currentTurn));
     setSelectedAttribute(null);
     setRoundResult(null);
 
