@@ -49,6 +49,12 @@ public class GlobalExceptionHandler {
         return error(HttpStatus.BAD_REQUEST, exception.getMessage(), exchange);
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public Mono<ResponseEntity<ApiError>> handleIllegalState(IllegalStateException exception, ServerWebExchange exchange) {
+        log.warn("invalid state path={} message={}", exchange.getRequest().getPath(), exception.getMessage());
+        return error(HttpStatus.CONFLICT, exception.getMessage(), exchange);
+    }
+
     @ExceptionHandler(ServerWebInputException.class)
     public Mono<ResponseEntity<ApiError>> handleInvalidInput(ServerWebInputException exception, ServerWebExchange exchange) {
         log.warn("invalid request body path={} message={}", exchange.getRequest().getPath(), exception.getMessage());

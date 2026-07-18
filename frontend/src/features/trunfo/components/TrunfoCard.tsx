@@ -12,20 +12,23 @@ type Props = {
   card: TrunfoCardModel | null;
   side: 'player' | 'cpu';
   isHidden?: boolean;
+  hiddenLabel?: string;
   selectedAttribute?: TrunfoAttributeKey | null;
   winningAttribute?: TrunfoAttributeKey | null;
 };
 
-export function TrunfoCard({ card, side, isHidden = false, selectedAttribute, winningAttribute }: Props) {
+export function TrunfoCard({ card, side, isHidden = false, hiddenLabel, selectedAttribute, winningAttribute }: Props) {
   const messages = useMessages();
 
   if (!card || isHidden) {
+    const defaultHiddenLabel = side === 'cpu' ? messages.trunfo.cpuCard : messages.trunfo.hiddenCard;
+
     return (
       <article className="trunfo-card trunfo-card--back trunfo-card--face-down">
         <div className="trunfo-card-back-symbol">
           <ShieldQuestion size={42} />
         </div>
-        <strong>{side === 'cpu' ? messages.trunfo.cpuCard : messages.trunfo.hiddenCard}</strong>
+        <strong>{hiddenLabel ?? defaultHiddenLabel}</strong>
         <span>{messages.trunfo.revealHint}</span>
       </article>
     );

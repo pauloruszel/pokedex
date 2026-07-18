@@ -4,6 +4,7 @@ import { useAppLanguage, useMessages } from '../shared/i18n/I18nProvider';
 import { AppChrome, type AppView } from './AppChrome';
 import { AppRoutes } from './AppRoutes';
 import '../styles/global.css';
+import '../styles/interaction-states.css';
 
 export default function App() {
   const messages = useMessages();

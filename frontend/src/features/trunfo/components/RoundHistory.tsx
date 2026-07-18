@@ -1,16 +1,18 @@
 import { History } from 'lucide-react';
 import { useI18nFormat, useMessages } from '../../../shared/i18n/I18nProvider';
 import { formatPokemonName } from '../../../shared/utils/format';
-import type { RoundHistoryItem } from '../types/trunfoGame';
+import type { RoundHistoryItem, TrunfoGameMode } from '../types/trunfoGame';
 import { formatAttributeValue, getAttributeLabel } from '../utils/trunfoAttributes';
 
 type Props = {
   history: RoundHistoryItem[];
+  gameMode: TrunfoGameMode;
 };
 
-export function RoundHistory({ history }: Props) {
+export function RoundHistory({ history, gameMode }: Props) {
   const messages = useMessages();
   const format = useI18nFormat();
+  const isLocalPvp = gameMode === 'local-pvp';
 
   return (
     <aside className="trunfo-history">
@@ -26,7 +28,13 @@ export function RoundHistory({ history }: Props) {
           {history.map((item) => (
             <article className={`trunfo-history-item trunfo-history-item--${item.result}`} key={item.round}>
               <span>{messages.trunfo.round} {item.round}</span>
-              <strong>{item.result === 'player' ? messages.common.you : item.result === 'cpu' ? messages.common.cpu : messages.common.draw}</strong>
+              <strong>
+                {item.result === 'player'
+                  ? (isLocalPvp ? 'Jogador 1' : messages.common.you)
+                  : item.result === 'cpu'
+                    ? (isLocalPvp ? 'Jogador 2' : messages.common.cpu)
+                    : messages.common.draw}
+              </strong>
               <mark>{messages.trunfo.diff}: {Math.abs(item.playerValue - item.cpuValue)}</mark>
               <small>
                 {getAttributeLabel(item.attribute, messages)}: {formatPokemonName(item.playerName)} {formatAttributeValue(item.attribute, item.playerValue)}

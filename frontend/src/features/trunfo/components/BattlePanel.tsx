@@ -1,8 +1,8 @@
-import { ArrowRight, Bot, RotateCcw, Trophy, UserRound } from 'lucide-react';
+import { ArrowRight, Bot, RotateCcw, Trophy, UserRound, Users } from 'lucide-react';
 import { useI18nFormat, useMessages } from '../../../shared/i18n/I18nProvider';
 import { formatPokemonName } from '../../../shared/utils/format';
 import type { TrunfoAttributeKey, TrunfoCardModel } from '../types/trunfoCard';
-import type { RoundHistoryItem } from '../types/trunfoGame';
+import type { PlayerSide, RoundHistoryItem, TrunfoGameMode } from '../types/trunfoGame';
 import { ATTRIBUTE_OPTIONS, formatAttributeValue, getAttributeLabel, getAttributeShortLabel } from '../utils/trunfoAttributes';
 import { TrunfoCard } from './TrunfoCard';
 
@@ -18,6 +18,8 @@ type Props = {
   roundResult: RoundHistoryItem | null;
   winner: string | null;
   cpuSuggestion: TrunfoAttributeKey | null;
+  gameMode: TrunfoGameMode;
+  currentTurn: PlayerSide;
   onPlay: (attribute: TrunfoAttributeKey) => void;
   onNext: () => void;
   onReset: () => void;
@@ -35,26 +37,35 @@ export function BattlePanel({
   roundResult,
   winner,
   cpuSuggestion,
+  gameMode,
+  currentTurn,
   onPlay,
   onNext,
   onReset
 }: Props) {
   const messages = useMessages();
   const format = useI18nFormat();
+  const isLocalPvp = gameMode === 'local-pvp';
   const isRevealed = status === 'revealed' || status === 'finished';
   const canPlay = status === 'ready';
+  const activeCard = currentTurn === 'player-one' ? playerCard : cpuCard;
   const winnerLabel = winner === 'Você' ? messages.common.you : winner === 'Empate' ? messages.common.draw : winner;
+  const playerOneLabel = isLocalPvp ? 'Jogador 1' : messages.common.you;
+  const playerTwoLabel = isLocalPvp ? 'Jogador 2' : 'CPU';
 
   return (
     <section className="trunfo-battle">
       <header className="trunfo-scoreboard">
         <div>
-          <span><UserRound size={16} /> {messages.common.you}</span>
+          <span><UserRound size={16} /> {playerOneLabel}</span>
           <strong>{playerDeckCount}</strong>
         </div>
-        <div className="trunfo-round-pill">{messages.trunfo.round} {round}</div>
+        <div className="trunfo-round-pill">
+          {messages.trunfo.round} {round}
+          {isLocalPvp && status === 'ready' && <small> · vez do {currentTurn === 'player-one' ? 'Jogador 1' : 'Jogador 2'}</small>}
+        </div>
         <div>
-          <span><Bot size={16} /> CPU</span>
+          <span>{isLocalPvp ? <Users size={16} /> : <Bot size={16} />} {playerTwoLabel}</span>
           <strong>{cpuDeckCount}</strong>
         </div>
       </header>
@@ -69,6 +80,8 @@ export function BattlePanel({
         <TrunfoCard
           card={playerCard}
           side="player"
+          isHidden={isLocalPvp && currentTurn === 'player-two' && !isRevealed}
+          hiddenLabel={isLocalPvp ? 'Carta do Jogador 1' : undefined}
           selectedAttribute={selectedAttribute}
           winningAttribute={roundResult?.result === 'player' ? selectedAttribute : null}
         />
@@ -83,7 +96,11 @@ export function BattlePanel({
           ) : roundResult ? (
             <>
               <span className={`trunfo-result trunfo-result--${roundResult.result}`}>
-                {roundResult.result === 'player' ? messages.trunfo.playerWon : roundResult.result === 'cpu' ? messages.trunfo.cpuWon : messages.common.draw}
+                {roundResult.result === 'player'
+                  ? (isLocalPvp ? 'Jogador 1 venceu a rodada' : messages.trunfo.playerWon)
+                  : roundResult.result === 'cpu'
+                    ? (isLocalPvp ? 'Jogador 2 venceu a rodada' : messages.trunfo.cpuWon)
+                    : messages.common.draw}
               </span>
               <strong>{getAttributeLabel(roundResult.attribute, messages)}</strong>
               <p>
@@ -91,15 +108,13 @@ export function BattlePanel({
                 {' '}x{' '}
                 {formatAttributeValue(roundResult.attribute, roundResult.cpuValue)} {formatPokemonName(roundResult.cpuName)}
               </p>
-              {roundResult.result === 'draw' && (
-                <small>{format(messages.trunfo.potDraw, { count: roundResult.potSize })}</small>
-              )}
+              {roundResult.result === 'draw' && <small>{format(messages.trunfo.potDraw, { count: roundResult.potSize })}</small>}
               <button className="primary-control" onClick={onNext}>{messages.trunfo.nextRound} <ArrowRight size={17} /></button>
             </>
           ) : (
             <>
               <span className="trunfo-result">{messages.trunfo.chooseAttribute}</span>
-              <p>{messages.trunfo.cpuHidden}</p>
+              <p>{isLocalPvp ? 'Apenas o jogador da vez deve olhar a tela e escolher o atributo.' : messages.trunfo.cpuHidden}</p>
               {cpuSuggestion && <small>{format(messages.trunfo.cpuSuggestion, { attribute: getAttributeLabel(cpuSuggestion, messages) })}</small>}
             </>
           )}
@@ -108,7 +123,8 @@ export function BattlePanel({
         <TrunfoCard
           card={cpuCard}
           side="cpu"
-          isHidden={!isRevealed}
+          isHidden={!isRevealed && (!isLocalPvp || currentTurn === 'player-one')}
+          hiddenLabel={isLocalPvp ? 'Carta do Jogador 2' : undefined}
           selectedAttribute={selectedAttribute}
           winningAttribute={roundResult?.result === 'cpu' ? selectedAttribute : null}
         />
@@ -123,7 +139,7 @@ export function BattlePanel({
             onClick={() => onPlay(option.key)}
           >
             <span>{getAttributeShortLabel(option.key, messages)}</span>
-            <strong>{playerCard ? formatAttributeValue(option.key, playerCard.attributes[option.key]) : '-'}</strong>
+            <strong>{activeCard ? formatAttributeValue(option.key, activeCard.attributes[option.key]) : '-'}</strong>
           </button>
         ))}
       </div>
