@@ -81,6 +81,7 @@ export function BattlePanel({
           card={playerCard}
           side="player"
           isHidden={isLocalPvp && currentTurn === 'player-two' && !isRevealed}
+          hiddenLabel={isLocalPvp ? 'Carta do Jogador 1' : undefined}
           selectedAttribute={selectedAttribute}
           winningAttribute={roundResult?.result === 'player' ? selectedAttribute : null}
         />
@@ -113,7 +114,7 @@ export function BattlePanel({
           ) : (
             <>
               <span className="trunfo-result">{messages.trunfo.chooseAttribute}</span>
-              <p>{isLocalPvp ? 'O adversário deve olhar para o outro lado enquanto o jogador da vez escolhe.' : messages.trunfo.cpuHidden}</p>
+              <p>{isLocalPvp ? 'Apenas o jogador da vez deve olhar a tela e escolher o atributo.' : messages.trunfo.cpuHidden}</p>
               {cpuSuggestion && <small>{format(messages.trunfo.cpuSuggestion, { attribute: getAttributeLabel(cpuSuggestion, messages) })}</small>}
             </>
           )}
@@ -123,6 +124,7 @@ export function BattlePanel({
           card={cpuCard}
           side="cpu"
           isHidden={!isRevealed && (!isLocalPvp || currentTurn === 'player-one')}
+          hiddenLabel={isLocalPvp ? 'Carta do Jogador 2' : undefined}
           selectedAttribute={selectedAttribute}
           winningAttribute={roundResult?.result === 'cpu' ? selectedAttribute : null}
         />
