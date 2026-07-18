@@ -122,3 +122,28 @@ CREATE TABLE IF NOT EXISTS pokemon_image (
 );
 
 CREATE INDEX IF NOT EXISTS idx_pokemon_image_pokemon ON pokemon_image(pokemon_id);
+
+CREATE TABLE IF NOT EXISTS trunfo_room (
+    code VARCHAR(12) PRIMARY KEY,
+    state VARCHAR(40) NOT NULL,
+    mode VARCHAR(40) NOT NULL,
+    difficulty VARCHAR(40) NOT NULL,
+    deck_size INT NOT NULL DEFAULT 8,
+    type_name VARCHAR(80),
+    player_one_name VARCHAR(80) NOT NULL,
+    player_two_name VARCHAR(80),
+    player_one_token VARCHAR(80) NOT NULL,
+    player_two_token VARCHAR(80),
+    player_one_deck CLOB,
+    player_two_deck CLOB,
+    dispute_pile CLOB,
+    history CLOB,
+    current_turn VARCHAR(20) NOT NULL,
+    round_number INT NOT NULL DEFAULT 1,
+    winner VARCHAR(80),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP
+);
+
+ALTER TABLE trunfo_room ADD COLUMN IF NOT EXISTS deck_size INT NOT NULL DEFAULT 8;

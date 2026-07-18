@@ -9,3 +9,33 @@ export type TrunfoApiCard = {
   legendaryCharge: boolean;
   attributes: Record<TrunfoAttributeKey, number>;
 };
+
+export type TrunfoRoomRoundDto = {
+  round: number;
+  attribute: TrunfoAttributeKey;
+  playerOneCard: TrunfoApiCard;
+  playerTwoCard: TrunfoApiCard;
+  playerOneValue: number;
+  playerTwoValue: number;
+  result: 'player' | 'cpu' | 'draw';
+  potSize: number;
+};
+
+export type TrunfoRoomDto = {
+  code: string;
+  state: 'WAITING_FOR_PLAYER' | 'IN_PROGRESS' | 'FINISHED';
+  playerSide: 'player-one' | 'player-two';
+  playerToken: string;
+  playerOneName: string;
+  playerTwoName: string | null;
+  currentTurn: 'player-one' | 'player-two';
+  round: number;
+  playerDeckCount: number;
+  opponentDeckCount: number;
+  disputePileCount: number;
+  playerCard: TrunfoApiCard | null;
+  opponentCard: TrunfoApiCard | null;
+  lastRound: TrunfoRoomRoundDto | null;
+  winner: string | null;
+  history: TrunfoRoomRoundDto[];
+};
