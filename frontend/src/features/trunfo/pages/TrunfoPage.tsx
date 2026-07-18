@@ -141,8 +141,11 @@ export function TrunfoPage({ favorites, types, loadDetail }: Props) {
       : buildBalancedCpuDeck(draftCards, selectedCards);
     const firstPlayerCards = setup.gameMode === 'local-pvp' ? playerOneCards : selectedCards;
 
-    if (opponentCards.length < firstPlayerCards.length) {
-      setSetupError(messages.trunfo.draftError);
+    const invalidDecks = setup.gameMode === 'local-pvp'
+      ? opponentCards.length !== firstPlayerCards.length
+      : opponentCards.length < firstPlayerCards.length;
+    if (invalidDecks) {
+      setSetupError(setup.gameMode === 'local-pvp' ? 'Os dois jogadores precisam escolher a mesma quantidade de cartas.' : messages.trunfo.draftError);
       return;
     }
 
@@ -172,13 +175,13 @@ export function TrunfoPage({ favorites, types, loadDetail }: Props) {
           <>
             {setup.gameMode === 'local-pvp' && (
               <div className="trunfo-dispute-banner">
-                {draftPlayer === 'player-one' ? 'Jogador 1: escolha seu baralho.' : 'Jogador 2: escolha seu baralho sem olhar as escolhas do Jogador 1.'}
+                {draftPlayer === 'player-one' ? 'Jogador 1: escolha seu baralho.' : `Jogador 2: escolha ${playerOneCards.length} cartas sem olhar as escolhas do Jogador 1.`}
               </div>
             )}
             <DeckDraft
               cards={draftCards}
               selectedIds={selectedIds}
-              deckSize={TRUNFO_DECK_SIZE}
+              deckSize={setup.gameMode === 'local-pvp' && draftPlayer === 'player-two' ? playerOneCards.length : TRUNFO_DECK_SIZE}
               isLoading={game.status === 'loading' || isPreparing}
               canLoadMore={setup.mode !== 'favorites' && hasMoreDraftCards}
               error={setupError}
@@ -222,7 +225,7 @@ export function TrunfoPage({ favorites, types, loadDetail }: Props) {
               backToSetup();
             }}
           />
-          <RoundHistory history={game.history} />
+          <RoundHistory history={game.history} gameMode={game.gameMode} />
         </div>
       )}
     </section>
