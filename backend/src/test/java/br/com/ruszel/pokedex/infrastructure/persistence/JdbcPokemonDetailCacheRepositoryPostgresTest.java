@@ -166,7 +166,7 @@ class JdbcPokemonDetailCacheRepositoryPostgresTest {
     private void seedData() {
         insertPokemon(25, "pikachu", 4, 60, SpeciesTextLocalizer.CACHE_LOCALE);
         insertPokemon(26, "raichu", 8, 300, "en");
-        insertPokemon(27, "sandshrew", null, 120, SpeciesTextLocalizer.CACHE_LOCALE);
+        insertPokemonWithoutHeight(27, "sandshrew", 120, SpeciesTextLocalizer.CACHE_LOCALE);
 
         jdbcClient.sql("INSERT INTO pokemon_type (pokemon_id, type_name, slot_order) VALUES (25, 'electric', 1)").update();
         jdbcClient.sql("INSERT INTO pokemon_ability (pokemon_id, ability_name, slot_order) VALUES (25, 'static', 1)").update();
@@ -176,7 +176,7 @@ class JdbcPokemonDetailCacheRepositoryPostgresTest {
         jdbcClient.sql("INSERT INTO pokemon_evolution (pokemon_id, evolution_name, chain_order) VALUES (25, 'raichu', 3)").update();
     }
 
-    private void insertPokemon(int id, String name, Integer height, int weight, String locale) {
+    private void insertPokemon(int id, String name, int height, int weight, String locale) {
         jdbcClient.sql("""
                 INSERT INTO pokemon (id, name, image_url, sprite_url, height, weight)
                 VALUES (:id, :name, :imageUrl, :spriteUrl, :height, :weight)
@@ -188,7 +188,24 @@ class JdbcPokemonDetailCacheRepositoryPostgresTest {
                 .param("height", height)
                 .param("weight", weight)
                 .update();
+        insertSpecies(id, locale);
+    }
 
+    private void insertPokemonWithoutHeight(int id, String name, int weight, String locale) {
+        jdbcClient.sql("""
+                INSERT INTO pokemon (id, name, image_url, sprite_url, height, weight)
+                VALUES (:id, :name, :imageUrl, :spriteUrl, NULL, :weight)
+                """)
+                .param("id", id)
+                .param("name", name)
+                .param("imageUrl", "/images/" + id + ".png")
+                .param("spriteUrl", "/sprites/" + id + ".png")
+                .param("weight", weight)
+                .update();
+        insertSpecies(id, locale);
+    }
+
+    private void insertSpecies(int id, String locale) {
         jdbcClient.sql("""
                 INSERT INTO pokemon_species (pokemon_id, genus, flavor_text, text_locale, color, habitat, generation)
                 VALUES (:id, 'Mouse Pokemon', 'Test flavor text', :locale, 'yellow', 'forest', 'generation-i')
