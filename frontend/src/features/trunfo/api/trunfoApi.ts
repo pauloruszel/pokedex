@@ -27,7 +27,7 @@ export const trunfoApi = {
 
     return request<TrunfoApiCard[]>(`/api/trunfo/cards?${params.toString()}`);
   },
-  createRoom: (body: { nickname: string; mode: string; difficulty: TrunfoDifficulty; type?: string; deckSize?: number }) => (
+  createRoom: (body: { nickname: string; mode: string; difficulty: TrunfoDifficulty; type?: string; deckSelection?: string; deckSize?: number }) => (
     request<TrunfoRoomDto>('/api/trunfo/rooms', jsonRequest(body))
   ),
   joinRoom: (code: string, nickname: string) => (
@@ -41,6 +41,9 @@ export const trunfoApi = {
   ),
   leaveRoom: (code: string, playerToken: string) => (
     request<TrunfoRoomDto>(`/api/trunfo/rooms/${encodeURIComponent(code)}/leave`, jsonRequest({ playerToken }))
+  ),
+  confirmDeck: (code: string, playerToken: string, cardIds: number[]) => (
+    request<TrunfoRoomDto>(`/api/trunfo/rooms/${encodeURIComponent(code)}/deck`, jsonRequest({ playerToken, cardIds }))
   )
 };
 

@@ -54,7 +54,7 @@ public class TrunfoController {
     @PostMapping("/rooms")
     @Operation(summary = "Cria uma sala privada de Trunfo")
     public Mono<TrunfoRoomView> createRoom(@RequestBody CreateRoomRequest request) {
-        return Mono.just(trunfoRoomService.create(request.nickname(), request.mode(), request.difficulty(), request.type(), request.deckSize()));
+        return Mono.just(trunfoRoomService.create(request.nickname(), request.mode(), request.difficulty(), request.type(), request.deckSelection(), request.deckSize()));
     }
 
     @PostMapping("/rooms/{code}/join")
@@ -77,8 +77,8 @@ public class TrunfoController {
 
     @PostMapping("/rooms/{code}/deck")
     @Operation(summary = "Confirma deck da sala privada de Trunfo")
-    public Mono<TrunfoRoomView> confirmDeck(@PathVariable String code, @RequestBody PlayerRoomRequest request) {
-        return Mono.just(trunfoRoomService.get(code, request.playerToken()));
+    public Mono<TrunfoRoomView> confirmDeck(@PathVariable String code, @RequestBody DeckRequest request) {
+        return trunfoRoomService.confirmDeck(code, request.playerToken(), request.cardIds());
     }
 
     @PostMapping("/rooms/{code}/ready")
@@ -93,7 +93,7 @@ public class TrunfoController {
         return Mono.just(trunfoRoomService.leave(code, request.playerToken()));
     }
 
-    public record CreateRoomRequest(String nickname, String mode, String difficulty, String type, Integer deckSize) {
+    public record CreateRoomRequest(String nickname, String mode, String difficulty, String type, String deckSelection, Integer deckSize) {
     }
 
     public record JoinRoomRequest(String nickname) {
@@ -103,5 +103,8 @@ public class TrunfoController {
     }
 
     public record PlayerRoomRequest(String playerToken) {
+    }
+
+    public record DeckRequest(String playerToken, List<Integer> cardIds) {
     }
 }

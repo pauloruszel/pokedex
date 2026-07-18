@@ -5,6 +5,11 @@ import java.util.List;
 public record TrunfoRoomView(
         String code,
         String state,
+        String mode,
+        String difficulty,
+        String type,
+        String deckSelection,
+        Integer deckSize,
         String playerSide,
         String playerToken,
         String playerOneName,

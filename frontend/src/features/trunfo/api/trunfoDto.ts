@@ -23,7 +23,12 @@ export type TrunfoRoomRoundDto = {
 
 export type TrunfoRoomDto = {
   code: string;
-  state: 'WAITING_FOR_PLAYER' | 'IN_PROGRESS' | 'FINISHED';
+  state: 'WAITING_FOR_PLAYER' | 'DECK_SELECTION' | 'IN_PROGRESS' | 'FINISHED';
+  mode: string;
+  difficulty: 'casual' | 'balanced' | 'expert';
+  type: string | null;
+  deckSelection: 'auto' | 'manual';
+  deckSize: number;
   playerSide: 'player-one' | 'player-two';
   playerToken: string;
   playerOneName: string;

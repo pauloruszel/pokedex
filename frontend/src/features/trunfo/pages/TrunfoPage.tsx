@@ -47,6 +47,8 @@ export function TrunfoPage({ favorites, types, loadDetail }: Props) {
   const [onlineCode, setOnlineCode] = useState('');
   const [onlineDeckSize, setOnlineDeckSize] = useState(8);
   const [onlineRoom, setOnlineRoom] = useState<TrunfoRoomDto | null>(null);
+  const [onlineDraftCards, setOnlineDraftCards] = useState<TrunfoCardModel[]>([]);
+  const [onlineSelectedIds, setOnlineSelectedIds] = useState<Set<number>>(new Set());
   const [onlineError, setOnlineError] = useState<string | null>(null);
   const [onlineLoading, setOnlineLoading] = useState(false);
   const [dismissedOnlineRound, setDismissedOnlineRound] = useState<number | null>(null);
@@ -74,6 +76,16 @@ export function TrunfoPage({ favorites, types, loadDetail }: Props) {
     }, 3000);
     return () => window.clearInterval(id);
   }, [onlineRoom]);
+
+  useEffect(() => {
+    if (onlineRoom?.state !== 'DECK_SELECTION' || onlineDraftCards.length > 0) return;
+
+    setOnlineLoading(true);
+    trunfoApi.cards(80, onlineRoom.difficulty, onlineRoom.type ?? undefined)
+      .then((cards) => setOnlineDraftCards(cards.map(createTrunfoCardFromApi)))
+      .catch(() => setOnlineError(messages.trunfo.setupError))
+      .finally(() => setOnlineLoading(false));
+  }, [messages.trunfo.setupError, onlineDraftCards.length, onlineRoom]);
 
   async function startGame() {
     if (setup.gameMode === 'online-pvp') {
@@ -214,6 +226,7 @@ export function TrunfoPage({ favorites, types, loadDetail }: Props) {
         nickname: onlineName,
         mode: setup.mode,
         difficulty: setup.difficulty,
+        deckSelection: setup.deckSelection,
         deckSize: onlineDeckSize,
         type: setup.mode === 'type' ? setup.type : undefined
       }));
@@ -253,8 +266,29 @@ export function TrunfoPage({ favorites, types, loadDetail }: Props) {
     }
   }
 
+  async function confirmOnlineDeck() {
+    if (!onlineRoom) return;
+    if (onlineSelectedIds.size !== onlineRoom.deckSize) {
+      setOnlineError(`Escolha exatamente ${onlineRoom.deckSize} cartas.`);
+      return;
+    }
+
+    setOnlineLoading(true);
+    setOnlineError(null);
+    try {
+      setOnlineRoom(await trunfoApi.confirmDeck(onlineRoom.code, onlineRoom.playerToken, Array.from(onlineSelectedIds)));
+      setOnlineSelectedIds(new Set());
+    } catch {
+      setOnlineError('Nao foi possivel confirmar o baralho.');
+    } finally {
+      setOnlineLoading(false);
+    }
+  }
+
   function saveOnlineRoom(room: TrunfoRoomDto) {
     setOnlineRoom(room);
+    setOnlineDraftCards([]);
+    setOnlineSelectedIds(new Set());
     localStorage.setItem(ONLINE_SESSION_KEY, JSON.stringify({ code: room.code, playerToken: room.playerToken }));
   }
 
@@ -268,6 +302,42 @@ export function TrunfoPage({ favorites, types, loadDetail }: Props) {
   }
 
   if (onlineRoom) {
+    if (onlineRoom.state === 'DECK_SELECTION') {
+      return (
+        <section className="trunfo-page">
+          <div className="trunfo-dispute-banner">
+            {onlineRoom.playerDeckCount > 0 ? 'Baralho confirmado. Aguardando o adversario.' : `Escolha ${onlineRoom.deckSize} cartas para a sala ${onlineRoom.code}.`}
+          </div>
+          {onlineRoom.playerDeckCount > 0 ? (
+            <OnlineRoom
+              room={onlineRoom}
+              isLoading={onlineLoading}
+              error={onlineError}
+              dismissedRound={dismissedOnlineRound}
+              onPlay={playOnlineRound}
+              onNextRound={(round) => setDismissedOnlineRound(round)}
+              onRefresh={() => trunfoApi.room(onlineRoom.code, onlineRoom.playerToken).then(setOnlineRoom).catch(() => setOnlineError('Nao foi possivel atualizar a sala.'))}
+              onLeave={leaveOnlineRoom}
+            />
+          ) : (
+            <DeckDraft
+              cards={onlineDraftCards}
+              selectedIds={onlineSelectedIds}
+              deckSize={onlineRoom.deckSize}
+              isLoading={onlineLoading}
+              canLoadMore={false}
+              error={onlineError}
+              description="Seu adversario nao ve as cartas que voce escolheu."
+              onToggle={(card) => setOnlineSelectedIds((current) => toggleCardId(current, card.id, onlineRoom.deckSize))}
+              onConfirm={confirmOnlineDeck}
+              onBack={leaveOnlineRoom}
+              onLoadMore={() => undefined}
+            />
+          )}
+        </section>
+      );
+    }
+
     return (
       <section className="trunfo-page">
         <OnlineRoom
@@ -374,6 +444,13 @@ export function TrunfoPage({ favorites, types, loadDetail }: Props) {
 function mergeCards(current: TrunfoCardModel[], next: TrunfoCardModel[]) {
   const ids = new Set(current.map((card) => card.id));
   return [...current, ...next.filter((card) => !ids.has(card.id))];
+}
+
+function toggleCardId(current: Set<number>, id: number, limit: number) {
+  const next = new Set(current);
+  if (next.has(id)) next.delete(id);
+  else if (next.size < limit) next.add(id);
+  return next;
 }
 
 function OnlineRoom({ room, isLoading, error, dismissedRound, onPlay, onNextRound, onRefresh, onLeave }: {

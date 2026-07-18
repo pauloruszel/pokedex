@@ -49,7 +49,6 @@ export function GameSetup({ setup, types, favoritesCount, isLoading, error, onCh
       icon: Hand
     }
   ];
-  const visibleDeckSelections = isOnlinePvp ? deckSelections.filter((selection) => selection.value === 'auto') : deckSelections;
 
   return (
     <section className="trunfo-setup">
@@ -123,7 +122,7 @@ export function GameSetup({ setup, types, favoritesCount, isLoading, error, onCh
         <div className="trunfo-control-group">
           <span><Hand size={16} /> {messages.trunfo.deckSelection}</span>
           <div className="trunfo-difficulty-grid">
-            {visibleDeckSelections.map((selection) => {
+            {deckSelections.map((selection) => {
               const Icon = selection.icon;
               return (
                 <button

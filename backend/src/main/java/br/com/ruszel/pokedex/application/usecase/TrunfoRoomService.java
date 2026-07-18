@@ -34,7 +34,7 @@ public class TrunfoRoomService {
     private final ListTrunfoCardsUseCase listTrunfoCardsUseCase;
 
     @Transactional
-    public TrunfoRoomView create(String nickname, String mode, String difficulty, String type, Integer deckSize) {
+    public TrunfoRoomView create(String nickname, String mode, String difficulty, String type, String deckSelection, Integer deckSize) {
         String code;
         do {
             code = randomCode();
@@ -44,13 +44,14 @@ public class TrunfoRoomService {
         String token = UUID.randomUUID().toString();
         jdbcClient.sql("""
                         INSERT INTO trunfo_room
-                            (code, state, mode, difficulty, deck_size, type_name, player_one_name, player_one_token, dispute_pile, history, current_turn, expires_at)
+                            (code, state, mode, difficulty, deck_selection, deck_size, type_name, player_one_name, player_one_token, dispute_pile, history, current_turn, expires_at)
                         VALUES
-                            (:code, 'WAITING_FOR_PLAYER', :mode, :difficulty, :deckSize, :type, :name, :token, '[]', '[]', 'player-one', :expiresAt)
+                            (:code, 'WAITING_FOR_PLAYER', :mode, :difficulty, :deckSelection, :deckSize, :type, :name, :token, '[]', '[]', 'player-one', :expiresAt)
                         """)
                 .param("code", code)
                 .param("mode", blankToDefault(mode, "all"))
                 .param("difficulty", blankToDefault(difficulty, "balanced"))
+                .param("deckSelection", sanitizeDeckSelection(deckSelection))
                 .param("deckSize", sanitizedDeckSize)
                 .param("type", hasText(type) ? type : null)
                 .param("name", blankToDefault(nickname, "Jogador 1"))
@@ -67,6 +68,22 @@ public class TrunfoRoomService {
             throw new IllegalStateException("Sala cheia.");
         }
         String token = UUID.randomUUID().toString();
+        if ("manual".equals(room.deckSelection())) {
+            jdbcClient.sql("""
+                            UPDATE trunfo_room
+                               SET state = 'DECK_SELECTION',
+                                   player_two_name = :name,
+                                   player_two_token = :token,
+                                   updated_at = CURRENT_TIMESTAMP
+                             WHERE code = :code
+                            """)
+                    .param("name", blankToDefault(nickname, "Jogador 2"))
+                    .param("token", token)
+                    .param("code", room.code())
+                    .update();
+            return Mono.just(view(read(room.code()), "player-two", token, false));
+        }
+
         int deckSize = sanitizeDeckSize(room.deckSize());
         return listTrunfoCardsUseCase.execute(deckSize * 2, room.difficulty(), room.typeName(), 0)
                 .map(cards -> {
@@ -99,6 +116,52 @@ public class TrunfoRoomService {
         Room room = read(code);
         String side = sideFor(room, token);
         return view(room, side, token, false);
+    }
+
+    @Transactional
+    public Mono<TrunfoRoomView> confirmDeck(String code, String token, List<Integer> cardIds) {
+        Room room = read(code);
+        String side = sideFor(room, token);
+        if (!"DECK_SELECTION".equals(room.state())) {
+            throw new IllegalStateException("Sala nao esta na escolha de baralho.");
+        }
+        int deckSize = sanitizeDeckSize(room.deckSize());
+        List<Integer> selectedIds = cardIds == null ? List.of() : cardIds.stream().distinct().toList();
+        if (selectedIds.size() != deckSize) {
+            throw new IllegalArgumentException("Escolha exatamente " + deckSize + " cartas.");
+        }
+
+        return listTrunfoCardsUseCase.execute(80, room.difficulty(), room.typeName(), 0)
+                .map(cards -> {
+                    List<TrunfoCard> selectedCards = selectedIds.stream()
+                            .map(id -> cards.stream()
+                                    .filter(card -> card.id().equals(id))
+                                    .findFirst()
+                                    .orElseThrow(() -> new IllegalArgumentException("Carta invalida no baralho.")))
+                            .toList();
+                    List<TrunfoCard> opponentDeck = "player-one".equals(side)
+                            ? readCards(room.playerTwoDeck())
+                            : readCards(room.playerOneDeck());
+                    boolean hasOpponentCard = selectedCards.stream()
+                            .anyMatch(selected -> opponentDeck.stream().anyMatch(card -> card.id().equals(selected.id())));
+                    if (hasOpponentCard) {
+                        throw new IllegalArgumentException("Carta ja escolhida pelo adversario.");
+                    }
+                    String deckColumn = "player-one".equals(side) ? "player_one_deck" : "player_two_deck";
+                    jdbcClient.sql("UPDATE trunfo_room SET " + deckColumn + " = :deck, updated_at = CURRENT_TIMESTAMP WHERE code = :code")
+                            .param("deck", writeCards(selectedCards))
+                            .param("code", room.code())
+                            .update();
+
+                    Room updated = read(room.code());
+                    if (!readCards(updated.playerOneDeck()).isEmpty() && !readCards(updated.playerTwoDeck()).isEmpty()) {
+                        jdbcClient.sql("UPDATE trunfo_room SET state = 'IN_PROGRESS', updated_at = CURRENT_TIMESTAMP WHERE code = :code")
+                                .param("code", room.code())
+                                .update();
+                        updated = read(room.code());
+                    }
+                    return view(updated, side, token, false);
+                });
     }
 
     @Transactional
@@ -198,6 +261,11 @@ public class TrunfoRoomService {
         return new TrunfoRoomView(
                 room.code(),
                 room.state(),
+                room.mode(),
+                room.difficulty(),
+                room.typeName(),
+                room.deckSelection(),
+                sanitizeDeckSize(room.deckSize()),
                 side,
                 token,
                 room.playerOneName(),
@@ -223,6 +291,7 @@ public class TrunfoRoomService {
                         rs.getString("state"),
                         rs.getString("mode"),
                         rs.getString("difficulty"),
+                        rs.getString("deck_selection"),
                         rs.getInt("deck_size"),
                         rs.getString("type_name"),
                         rs.getString("player_one_name"),
@@ -260,6 +329,10 @@ public class TrunfoRoomService {
 
     private int sanitizeDeckSize(Integer deckSize) {
         return deckSize != null && deckSize >= NORMAL_DECK_SIZE ? NORMAL_DECK_SIZE : FAST_DECK_SIZE;
+    }
+
+    private String sanitizeDeckSelection(String deckSelection) {
+        return "manual".equalsIgnoreCase(deckSelection) ? "manual" : "auto";
     }
 
     private String normalizeCode(String code) {
@@ -331,6 +404,7 @@ public class TrunfoRoomService {
             String state,
             String mode,
             String difficulty,
+            String deckSelection,
             Integer deckSize,
             String typeName,
             String playerOneName,

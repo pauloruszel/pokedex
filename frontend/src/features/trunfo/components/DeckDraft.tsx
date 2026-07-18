@@ -24,7 +24,7 @@ type Props = {
 export function DeckDraft({ cards, selectedIds, deckSize, isLoading, canLoadMore, error, description, onToggle, onConfirm, onBack, onLoadMore }: Props) {
   const messages = useMessages();
   const selectedCount = selectedIds.size;
-  const canConfirm = selectedCount >= 4 && selectedCount <= deckSize && !isLoading;
+  const canConfirm = selectedCount === deckSize && !isLoading;
   const [query, setQuery] = useState('');
   const visibleCards = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
