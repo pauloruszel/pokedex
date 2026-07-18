@@ -52,9 +52,10 @@ export function BattlePanel({
   const winnerLabel = winner === 'Você' ? messages.common.you : winner === 'Empate' ? messages.common.draw : winner;
   const playerOneLabel = isLocalPvp ? 'Jogador 1' : messages.common.you;
   const playerTwoLabel = isLocalPvp ? 'Jogador 2' : 'CPU';
+  const hasActionPanel = Boolean(winner || roundResult);
 
   return (
-    <section className="trunfo-battle">
+    <section className={hasActionPanel ? 'trunfo-battle trunfo-battle--action' : 'trunfo-battle'}>
       <header className="trunfo-scoreboard">
         <div>
           <span><UserRound size={16} /> {playerOneLabel}</span>
@@ -86,7 +87,7 @@ export function BattlePanel({
           winningAttribute={roundResult?.result === 'player' ? selectedAttribute : null}
         />
 
-        <div className="trunfo-vs-panel">
+        <div className={hasActionPanel ? 'trunfo-vs-panel trunfo-vs-panel--action' : 'trunfo-vs-panel'}>
           {winner ? (
             <>
               <Trophy size={34} />
@@ -130,19 +131,21 @@ export function BattlePanel({
         />
       </div>
 
-      <div className="trunfo-attribute-picker">
-        {ATTRIBUTE_OPTIONS.map((option) => (
-          <button
-            className={selectedAttribute === option.key ? 'trunfo-attribute-button trunfo-attribute-button--active' : 'trunfo-attribute-button'}
-            disabled={!canPlay}
-            key={option.key}
-            onClick={() => onPlay(option.key)}
-          >
-            <span>{getAttributeShortLabel(option.key, messages)}</span>
-            <strong>{activeCard ? formatAttributeValue(option.key, activeCard.attributes[option.key]) : '-'}</strong>
-          </button>
-        ))}
-      </div>
+      {!hasActionPanel && (
+        <div className="trunfo-attribute-picker">
+          {ATTRIBUTE_OPTIONS.map((option) => (
+            <button
+              className={selectedAttribute === option.key ? 'trunfo-attribute-button trunfo-attribute-button--active' : 'trunfo-attribute-button'}
+              disabled={!canPlay}
+              key={option.key}
+              onClick={() => onPlay(option.key)}
+            >
+              <span>{getAttributeShortLabel(option.key, messages)}</span>
+              <strong>{activeCard ? formatAttributeValue(option.key, activeCard.attributes[option.key]) : '-'}</strong>
+            </button>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

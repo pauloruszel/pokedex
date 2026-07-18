@@ -469,10 +469,11 @@ function OnlineRoom({ room, isLoading, error, dismissedRound, onPlay, onNextRoun
   const ownLastCard = lastRound ? cardForSide(lastRound, room.playerSide) : null;
   const opponentLastCard = lastRound ? cardForSide(lastRound, room.playerSide === 'player-one' ? 'player-two' : 'player-one') : null;
   const turnLabel = isTurn ? 'Sua vez' : room.state === 'WAITING_FOR_PLAYER' ? 'Aguardando jogador' : 'Vez do adversario';
+  const hasActionPanel = Boolean(room.winner || lastRound);
 
   return (
     <div className="trunfo-game-layout">
-      <section className="trunfo-battle">
+      <section className={hasActionPanel ? 'trunfo-battle trunfo-battle--action' : 'trunfo-battle'}>
         <header className="trunfo-scoreboard">
           <div>
             <span>{room.playerSide === 'player-one' ? room.playerOneName : room.playerTwoName}</span>
@@ -490,7 +491,7 @@ function OnlineRoom({ room, isLoading, error, dismissedRound, onPlay, onNextRoun
 
         <div className="trunfo-table">
           <TrunfoCard card={lastRound ? ownLastCard : room.playerCard ? createTrunfoCardFromApi(room.playerCard) : null} side="player" selectedAttribute={lastRound?.attribute} />
-          <div className="trunfo-vs-panel">
+          <div className={hasActionPanel ? 'trunfo-vs-panel trunfo-vs-panel--action' : 'trunfo-vs-panel'}>
             {room.winner ? (
               <>
                 <span className="trunfo-result">Fim</span>
@@ -513,19 +514,21 @@ function OnlineRoom({ room, isLoading, error, dismissedRound, onPlay, onNextRoun
           <TrunfoCard card={lastRound ? opponentLastCard : null} side="cpu" isHidden={!lastRound} hiddenLabel="Carta do adversario" selectedAttribute={lastRound?.attribute} />
         </div>
 
-        <div className="trunfo-attribute-picker">
-          {ATTRIBUTE_OPTIONS.map((option) => (
-            <button
-              className="trunfo-attribute-button"
-              disabled={!isTurn || isLoading || !room.playerCard}
-              key={option.key}
-              onClick={() => onPlay(option.key)}
-            >
-              <span>{getAttributeShortLabel(option.key, messages)}</span>
-              <strong>{room.playerCard ? formatAttributeValue(option.key, room.playerCard.attributes[option.key]) : '-'}</strong>
-            </button>
-          ))}
-        </div>
+        {!hasActionPanel && (
+          <div className="trunfo-attribute-picker">
+            {ATTRIBUTE_OPTIONS.map((option) => (
+              <button
+                className="trunfo-attribute-button"
+                disabled={!isTurn || isLoading || !room.playerCard}
+                key={option.key}
+                onClick={() => onPlay(option.key)}
+              >
+                <span>{getAttributeShortLabel(option.key, messages)}</span>
+                <strong>{room.playerCard ? formatAttributeValue(option.key, room.playerCard.attributes[option.key]) : '-'}</strong>
+              </button>
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );

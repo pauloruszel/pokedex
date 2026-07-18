@@ -773,6 +773,7 @@ h2 { margin: 0; color: #fff; letter-spacing: -0.05em; }
 .trunfo-history-item--player { border-color: rgba(110,231,255,.34); }
 .trunfo-history-item--cpu { border-color: rgba(255,123,145,.34); }
 .trunfo-history-item--draw { border-color: rgba(255,214,110,.34); }
+.trunfo-history-mobile { display: none; }
 
 @keyframes fadeIn { from { opacity: 0; } }
 @keyframes slideIn { from { transform: translateX(36px); opacity: .6; } }
@@ -829,7 +830,7 @@ h2 { margin: 0; color: #fff; letter-spacing: -0.05em; }
 
 @media (max-width: 560px) {
   h1 { font-size: 2.75rem; }
-  .app-shell { width: min(100% - 18px, 1260px); padding-bottom: 88px; }
+  .app-shell { width: min(100% - 18px, 1260px); padding-bottom: 190px; }
   .hero-panel { min-height: 390px; }
   .hero-content { margin-top: 42px; }
   .brand-mark { width: 100%; justify-content: center; }
@@ -847,10 +848,195 @@ h2 { margin: 0; color: #fff; letter-spacing: -0.05em; }
   .trunfo-difficulty-grid, .trunfo-segmented { grid-template-columns: 1fr; }
   .trunfo-draft { padding: 12px; border-radius: 20px; }
   .trunfo-draft-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .trunfo-draft-actions {
+    position: sticky;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    z-index: 20;
+    margin: 12px -6px -6px;
+    padding: 8px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: rgba(18, 25, 40, .95);
+    box-shadow: 0 18px 42px rgba(0,0,0,.34);
+    backdrop-filter: blur(14px);
+  }
   .trunfo-draft-actions .primary-control, .trunfo-draft-actions .secondary-control { width: 100%; }
   .trunfo-online-panel { grid-template-columns: 1fr; }
-  .trunfo-card { min-height: 462px; border-radius: 24px; }
-  .trunfo-attribute-picker { grid-template-columns: repeat(2, 1fr); }
+  .trunfo-battle {
+    padding: 10px;
+    box-shadow: 0 18px 52px rgba(0,0,0,.22);
+  }
+  .trunfo-scoreboard {
+    position: sticky;
+    top: max(8px, env(safe-area-inset-top));
+    z-index: 12;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 6px;
+    margin: -2px -2px 8px;
+    padding: 4px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: rgba(18, 25, 40, .92);
+    backdrop-filter: blur(12px);
+  }
+  .trunfo-scoreboard > div:not(.trunfo-round-pill) {
+    min-height: 42px;
+    gap: 5px;
+    flex-direction: column;
+    justify-content: center;
+    padding: 7px 5px;
+    border-radius: 12px;
+  }
+  .trunfo-scoreboard span {
+    max-width: 100%;
+    overflow: hidden;
+    font-size: .68rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .trunfo-scoreboard strong { font-size: 1.1rem; }
+  .trunfo-round-pill {
+    align-self: stretch;
+    display: grid;
+    place-items: center;
+    min-width: 78px;
+    padding: 6px;
+    border-radius: 12px;
+    font-size: .72rem;
+    white-space: normal;
+    text-align: center;
+  }
+  .trunfo-round-pill small { display: block; }
+  .trunfo-dispute-banner {
+    margin: 0 0 8px;
+    padding: 8px 10px;
+    border-radius: 12px;
+    font-size: .82rem;
+  }
+  .trunfo-table { gap: 8px; }
+  .trunfo-vs-panel {
+    min-height: 0;
+    gap: 7px;
+    padding: 10px;
+    border-radius: 16px;
+  }
+  .trunfo-vs-panel p { font-size: .84rem; }
+  .trunfo-vs-panel--action {
+    position: fixed;
+    left: 9px;
+    right: 9px;
+    bottom: max(9px, env(safe-area-inset-bottom));
+    z-index: 40;
+    background: rgba(18, 25, 40, .97);
+    box-shadow: 0 18px 54px rgba(0,0,0,.42);
+    backdrop-filter: blur(16px);
+  }
+  .trunfo-vs-panel--action .primary-control,
+  .trunfo-vs-panel--action .secondary-control { width: 100%; }
+  .trunfo-card {
+    min-height: 0;
+    border-radius: 18px;
+    padding: 10px;
+  }
+  .trunfo-card-header strong { padding: 5px 7px; font-size: .72rem; }
+  .trunfo-card-image { height: 92px; }
+  .trunfo-card-image img { width: 98px; height: 98px; }
+  .trunfo-crown { top: 5px; right: calc(50% - 68px); }
+  .trunfo-card-title { gap: 5px; margin-bottom: 7px; }
+  .trunfo-card-title h3 { font-size: 1.05rem; }
+  .trunfo-card-power { margin-bottom: 6px; padding: 6px 8px; border-radius: 11px; }
+  .trunfo-card-power strong { font-size: 1.05rem; }
+  .trunfo-card-power small { display: none; }
+  .trunfo-attribute-list { grid-template-columns: repeat(3, 1fr); gap: 5px; }
+  .trunfo-attribute-row {
+    min-height: 42px;
+    display: grid;
+    justify-items: center;
+    gap: 2px;
+    padding: 5px;
+    text-align: center;
+  }
+  .trunfo-attribute-row span { font-size: .64rem; }
+  .trunfo-attribute-row strong { font-size: .84rem; }
+  .trunfo-legendary-rule { margin-top: 7px; font-size: .72rem; }
+  .trunfo-card--back {
+    min-height: 128px;
+    gap: 7px;
+  }
+  .trunfo-card-back-symbol { width: 56px; height: 56px; }
+  .trunfo-card--back strong { font-size: 1rem; }
+  .trunfo-card--back span { font-size: .78rem; }
+  .trunfo-attribute-picker {
+    position: fixed;
+    left: 9px;
+    right: 9px;
+    bottom: max(9px, env(safe-area-inset-bottom));
+    z-index: 40;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin: 0;
+    padding: 8px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: rgba(18, 25, 40, .97);
+    box-shadow: 0 18px 54px rgba(0,0,0,.42);
+    backdrop-filter: blur(16px);
+  }
+  .trunfo-attribute-button {
+    min-height: 48px;
+    border-radius: 12px;
+    padding: 5px;
+  }
+  .trunfo-attribute-button span { font-size: .64rem; }
+  .trunfo-attribute-button strong { font-size: .88rem; }
+  .trunfo-history--desktop { display: none; }
+  .trunfo-history-mobile {
+    display: block;
+    margin-top: 8px;
+  }
+  .trunfo-history-mobile summary {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 10px 12px;
+    color: #fff;
+    background: rgba(18, 25, 40, .92);
+    font-weight: 900;
+    list-style: none;
+  }
+  .trunfo-history-mobile summary::-webkit-details-marker { display: none; }
+  .trunfo-history-mobile summary span { display: flex; align-items: center; gap: 8px; }
+  .trunfo-history-mobile summary strong {
+    color: #101729;
+    background: #fff;
+    border-radius: 999px;
+    padding: 4px 9px;
+  }
+  .trunfo-history-mobile[open] {
+    position: fixed;
+    left: 9px;
+    right: 9px;
+    bottom: max(9px, env(safe-area-inset-bottom));
+    z-index: 60;
+    max-height: min(72vh, 560px);
+    overflow: auto;
+    padding: 8px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: rgba(18, 25, 40, .98);
+    box-shadow: 0 18px 54px rgba(0,0,0,.44);
+    backdrop-filter: blur(16px);
+  }
+  .trunfo-history-mobile[open] summary {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin-bottom: 8px;
+  }
 }
 
 @media (display-mode: standalone) {
