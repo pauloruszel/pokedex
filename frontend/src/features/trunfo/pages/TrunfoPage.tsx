@@ -124,7 +124,7 @@ export function TrunfoPage({ favorites, types, loadDetail }: Props) {
   async function startSelectedGame() {
     const selectedCards = draftCards.filter((card) => selectedIds.has(card.id));
     if (selectedCards.length < 4) {
-      setSetupError(messages.trunfo.draftError);
+      setSetupError(setup.gameMode === 'local-pvp' ? 'Cada jogador precisa escolher pelo menos 4 cartas e a mesma quantidade.' : messages.trunfo.draftError);
       return;
     }
 
@@ -185,6 +185,7 @@ export function TrunfoPage({ favorites, types, loadDetail }: Props) {
               isLoading={game.status === 'loading' || isPreparing}
               canLoadMore={setup.mode !== 'favorites' && hasMoreDraftCards}
               error={setupError}
+              description={setup.gameMode === 'local-pvp' ? 'Cada jogador escolhe seu baralho em uma etapa separada.' : undefined}
               onToggle={toggleDraftCard}
               onConfirm={startSelectedGame}
               onBack={backToSetup}

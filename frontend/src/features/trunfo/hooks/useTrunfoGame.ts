@@ -3,7 +3,7 @@ import type { PokemonDetail, PokemonSummary } from '../../pokemon/types/pokemon'
 import { buildDeckPool, splitDeck } from '../utils/trunfoDeck';
 import { createTrunfoCard } from '../utils/trunfoCardFactory';
 import { chooseCpuAttribute, compareCards } from '../utils/trunfoRules';
-import { localWinnerLabel, nextTurnForResult } from '../utils/trunfoTurnRules';
+import { applyRoundResult, localWinnerLabel, nextTurnForResult } from '../utils/trunfoTurnRules';
 import type { TrunfoAttributeKey, TrunfoCardModel } from '../types/trunfoCard';
 import type {
   GameStatus,
@@ -123,34 +123,18 @@ export function useTrunfoGame() {
   function nextRound() {
     if (!playerCard || !cpuCard || !roundResult) return;
 
-    const playerRest = playerDeck.slice(1);
-    const cpuRest = cpuDeck.slice(1);
-    const stake = [...disputePile, playerCard, cpuCard];
+    const nextState = applyRoundResult(roundResult.result, playerDeck, cpuDeck, disputePile);
 
-    if (roundResult.result === 'player') {
-      setPlayerDeck([...playerRest, ...stake]);
-      setCpuDeck(cpuRest);
-      setDisputePile([]);
-    } else if (roundResult.result === 'cpu') {
-      setPlayerDeck(playerRest);
-      setCpuDeck([...cpuRest, ...stake]);
-      setDisputePile([]);
-    } else {
-      setPlayerDeck(playerRest);
-      setCpuDeck(cpuRest);
-      setDisputePile(stake);
-    }
+    setPlayerDeck(nextState.playerOneDeck);
+    setCpuDeck(nextState.playerTwoDeck);
+    setDisputePile(nextState.disputePile);
 
     setCurrentTurn(gameMode === 'local-pvp' ? nextTurnForResult(roundResult.result, currentTurn) : 'player-one');
     setSelectedAttribute(null);
     setRoundResult(null);
 
-    const nextPlayerCount = roundResult.result === 'player'
-      ? playerRest.length + stake.length
-      : playerRest.length;
-    const nextCpuCount = roundResult.result === 'cpu'
-      ? cpuRest.length + stake.length
-      : cpuRest.length;
+    const nextPlayerCount = nextState.playerOneDeck.length;
+    const nextCpuCount = nextState.playerTwoDeck.length;
     setStatus(nextPlayerCount === 0 || nextCpuCount === 0 ? 'finished' : 'ready');
   }
 

@@ -13,3 +13,24 @@ export function localWinnerLabel(playerOneCards: number, playerTwoCards: number)
   if (playerTwoCards === 0) return 'Jogador 1';
   return null;
 }
+
+export function applyRoundResult<T>(
+  result: TurnRoundResult,
+  playerOneDeck: T[],
+  playerTwoDeck: T[],
+  disputePile: T[]
+) {
+  const playerOneRest = playerOneDeck.slice(1);
+  const playerTwoRest = playerTwoDeck.slice(1);
+  const stake = [...disputePile, playerOneDeck[0], playerTwoDeck[0]].filter((card): card is T => card !== undefined);
+
+  if (result === 'player') {
+    return { playerOneDeck: [...playerOneRest, ...stake], playerTwoDeck: playerTwoRest, disputePile: [] };
+  }
+
+  if (result === 'cpu') {
+    return { playerOneDeck: playerOneRest, playerTwoDeck: [...playerTwoRest, ...stake], disputePile: [] };
+  }
+
+  return { playerOneDeck: playerOneRest, playerTwoDeck: playerTwoRest, disputePile: stake };
+}

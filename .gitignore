@@ -27,3 +27,9 @@ missing-translations*.json
 
 # Generated architecture graph
 graphify-out/
+
+# Local agent tools and generated skill installs
+.agents/
+caveman-install.ps1
+docs/global-agent-context/
+skills-lock.json

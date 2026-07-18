@@ -14,13 +14,14 @@ type Props = {
   isLoading: boolean;
   canLoadMore: boolean;
   error: string | null;
+  description?: string;
   onToggle: (card: TrunfoCardModel) => void;
   onConfirm: () => void;
   onBack: () => void;
   onLoadMore: () => void;
 };
 
-export function DeckDraft({ cards, selectedIds, deckSize, isLoading, canLoadMore, error, onToggle, onConfirm, onBack, onLoadMore }: Props) {
+export function DeckDraft({ cards, selectedIds, deckSize, isLoading, canLoadMore, error, description, onToggle, onConfirm, onBack, onLoadMore }: Props) {
   const messages = useMessages();
   const selectedCount = selectedIds.size;
   const canConfirm = selectedCount >= 4 && selectedCount <= deckSize && !isLoading;
@@ -37,7 +38,7 @@ export function DeckDraft({ cards, selectedIds, deckSize, isLoading, canLoadMore
         <div>
           <span className="eyebrow-line">{messages.trunfo.draftEyebrow}</span>
           <h2>{messages.trunfo.draftTitle}</h2>
-          <p>{messages.trunfo.draftDescription}</p>
+          <p>{description ?? messages.trunfo.draftDescription}</p>
         </div>
         <strong>{selectedCount}/{deckSize}</strong>
       </header>
