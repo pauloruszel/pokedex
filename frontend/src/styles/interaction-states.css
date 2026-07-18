@@ -1,0 +1,50 @@
+/* Estados de interação compartilhados.
+   Mantém contraste legível em botões claros, inclusive no Safari/iOS. */
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+[role='button']:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid rgba(110, 231, 255, 0.72);
+  outline-offset: 3px;
+}
+
+.nav-pill--active,
+.language-option--active,
+.icon-button--active,
+.trunfo-segment--active,
+.trunfo-difficulty--active,
+.trunfo-attribute-button--active {
+  color: #101729 !important;
+  -webkit-text-fill-color: #101729;
+  background-color: #fff;
+}
+
+.nav-pill--active *,
+.language-option--active *,
+.icon-button--active *,
+.trunfo-segment--active *,
+.trunfo-difficulty--active *,
+.trunfo-attribute-button--active * {
+  color: inherit !important;
+  -webkit-text-fill-color: currentColor;
+}
+
+.trunfo-difficulty--active small {
+  opacity: 0.82;
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
+  filter: brightness(0.96);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button:active:not(:disabled) {
+    transform: none;
+  }
+}
