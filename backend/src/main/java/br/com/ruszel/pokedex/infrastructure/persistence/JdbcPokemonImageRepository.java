@@ -37,14 +37,16 @@ public class JdbcPokemonImageRepository implements PokemonImageRepository {
 
     @Override
     public void save(PokemonImage image) {
-        jdbcClient.sql("""
-                        MERGE INTO pokemon_image (
-                            pokemon_id, image_type, source_url, local_path, public_url, content_type, size_bytes, cached_at
-                        )
-                        KEY(pokemon_id, image_type)
-                        VALUES (
-                            :pokemonId, :imageType, :sourceUrl, :localPath, :publicUrl, :contentType, :sizeBytes, CURRENT_TIMESTAMP
-                        )
+        int updated = jdbcClient.sql("""
+                        UPDATE pokemon_image
+                           SET source_url = :sourceUrl,
+                               local_path = :localPath,
+                               public_url = :publicUrl,
+                               content_type = :contentType,
+                               size_bytes = :sizeBytes,
+                               cached_at = CURRENT_TIMESTAMP
+                         WHERE pokemon_id = :pokemonId
+                           AND image_type = :imageType
                         """)
                 .param("pokemonId", image.pokemonId())
                 .param("imageType", image.imageType())
@@ -54,5 +56,23 @@ public class JdbcPokemonImageRepository implements PokemonImageRepository {
                 .param("contentType", image.contentType())
                 .param("sizeBytes", image.sizeBytes())
                 .update();
+        if (updated == 0) {
+            jdbcClient.sql("""
+                            INSERT INTO pokemon_image (
+                                pokemon_id, image_type, source_url, local_path, public_url, content_type, size_bytes, cached_at
+                            )
+                            VALUES (
+                                :pokemonId, :imageType, :sourceUrl, :localPath, :publicUrl, :contentType, :sizeBytes, CURRENT_TIMESTAMP
+                            )
+                            """)
+                    .param("pokemonId", image.pokemonId())
+                    .param("imageType", image.imageType())
+                    .param("sourceUrl", image.sourceUrl())
+                    .param("localPath", image.localPath())
+                    .param("publicUrl", image.publicUrl())
+                    .param("contentType", image.contentType())
+                    .param("sizeBytes", image.sizeBytes())
+                    .update();
+        }
     }
 }

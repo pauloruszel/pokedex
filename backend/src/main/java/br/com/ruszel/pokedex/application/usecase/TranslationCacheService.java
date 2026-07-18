@@ -2,6 +2,7 @@ package br.com.ruszel.pokedex.application.usecase;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 
@@ -54,18 +55,23 @@ public class TranslationCacheService {
             String entityType,
             String entityId
     ) {
-        jdbcClient.sql("""
-                        MERGE INTO pokemon_text_translation (
-                            translation_key, source_text, text_kind, locale, translated_text, translation_source,
-                            source_locale, target_locale, text_hash, entity_type, entity_id, updated_at
-                        )
-                        KEY(translation_key)
-                        VALUES (
-                            :key, :sourceText, :kind, :locale, :translatedText, :translationSource,
-                            :sourceLocale, :targetLocale, :textHash, :entityType, :entityId, CURRENT_TIMESTAMP
-                        )
+        String key = keyFactory.cacheKey(kind, sourceLocale, targetLocale, sourceText);
+        int updated = jdbcClient.sql("""
+                        UPDATE pokemon_text_translation
+                           SET source_text = :sourceText,
+                               text_kind = :kind,
+                               locale = :locale,
+                               translated_text = :translatedText,
+                               translation_source = :translationSource,
+                               source_locale = :sourceLocale,
+                               target_locale = :targetLocale,
+                               text_hash = :textHash,
+                               entity_type = :entityType,
+                               entity_id = :entityId,
+                               updated_at = CURRENT_TIMESTAMP
+                         WHERE translation_key = :key
                         """)
-                .param("key", keyFactory.cacheKey(kind, sourceLocale, targetLocale, sourceText))
+                .param("key", key)
                 .param("sourceText", sourceText)
                 .param("kind", kind)
                 .param("locale", targetLocale)
@@ -77,23 +83,116 @@ public class TranslationCacheService {
                 .param("entityType", entityType)
                 .param("entityId", entityId)
                 .update();
+        if (updated == 0) {
+            try {
+                jdbcClient.sql("""
+                                INSERT INTO pokemon_text_translation (
+                                    translation_key, source_text, text_kind, locale, translated_text, translation_source,
+                                    source_locale, target_locale, text_hash, entity_type, entity_id, updated_at
+                                )
+                                VALUES (
+                                    :key, :sourceText, :kind, :locale, :translatedText, :translationSource,
+                                    :sourceLocale, :targetLocale, :textHash, :entityType, :entityId, CURRENT_TIMESTAMP
+                                )
+                                """)
+                        .param("key", key)
+                        .param("sourceText", sourceText)
+                        .param("kind", kind)
+                        .param("locale", targetLocale)
+                        .param("translatedText", translatedText)
+                        .param("translationSource", translationSource)
+                        .param("sourceLocale", sourceLocale)
+                        .param("targetLocale", targetLocale)
+                        .param("textHash", keyFactory.textHash(sourceText))
+                        .param("entityType", entityType)
+                        .param("entityId", entityId)
+                        .update();
+            } catch (DuplicateKeyException ignored) {
+                jdbcClient.sql("""
+                                UPDATE pokemon_text_translation
+                                   SET source_text = :sourceText,
+                                       text_kind = :kind,
+                                       locale = :locale,
+                                       translated_text = :translatedText,
+                                       translation_source = :translationSource,
+                                       source_locale = :sourceLocale,
+                                       target_locale = :targetLocale,
+                                       text_hash = :textHash,
+                                       entity_type = :entityType,
+                                       entity_id = :entityId,
+                                       updated_at = CURRENT_TIMESTAMP
+                                 WHERE translation_key = :key
+                                """)
+                        .param("key", key)
+                        .param("sourceText", sourceText)
+                        .param("kind", kind)
+                        .param("locale", targetLocale)
+                        .param("translatedText", translatedText)
+                        .param("translationSource", translationSource)
+                        .param("sourceLocale", sourceLocale)
+                        .param("targetLocale", targetLocale)
+                        .param("textHash", keyFactory.textHash(sourceText))
+                        .param("entityType", entityType)
+                        .param("entityId", entityId)
+                        .update();
+            }
+        }
     }
 
     public void saveLocal(String locale, String kind, String sourceText, String translatedText, String translationSource) {
-        jdbcClient.sql("""
-                        MERGE INTO pokemon_text_translation (
-                            translation_key, source_text, text_kind, locale, translated_text, translation_source, updated_at
-                        )
-                        KEY(translation_key)
-                        VALUES (:key, :sourceText, :kind, :locale, :translatedText, :translationSource, CURRENT_TIMESTAMP)
+        String key = keyFactory.localCacheKey(locale, kind, sourceText);
+        int updated = jdbcClient.sql("""
+                        UPDATE pokemon_text_translation
+                           SET source_text = :sourceText,
+                               text_kind = :kind,
+                               locale = :locale,
+                               translated_text = :translatedText,
+                               translation_source = :translationSource,
+                               updated_at = CURRENT_TIMESTAMP
+                         WHERE translation_key = :key
                         """)
-                .param("key", keyFactory.localCacheKey(locale, kind, sourceText))
+                .param("key", key)
                 .param("sourceText", sourceText)
                 .param("kind", kind)
                 .param("locale", locale)
                 .param("translatedText", translatedText)
                 .param("translationSource", translationSource)
                 .update();
+        if (updated == 0) {
+            try {
+                jdbcClient.sql("""
+                                INSERT INTO pokemon_text_translation (
+                                    translation_key, source_text, text_kind, locale, translated_text, translation_source, updated_at
+                                )
+                                VALUES (:key, :sourceText, :kind, :locale, :translatedText, :translationSource, CURRENT_TIMESTAMP)
+                                """)
+                        .param("key", key)
+                        .param("sourceText", sourceText)
+                        .param("kind", kind)
+                        .param("locale", locale)
+                        .param("translatedText", translatedText)
+                        .param("translationSource", translationSource)
+                        .update();
+            } catch (DuplicateKeyException ignored) {
+                jdbcClient.sql("""
+                                UPDATE pokemon_text_translation
+                                   SET source_text = :sourceText,
+                                       text_kind = :kind,
+                                       locale = :locale,
+                                       translated_text = :translatedText,
+                                       translation_source = :translationSource,
+                                       updated_at = CURRENT_TIMESTAMP
+                                 WHERE translation_key = :key
+                                """)
+                        .param("key", key)
+                        .param("sourceText", sourceText)
+                        .param("kind", kind)
+                        .param("locale", locale)
+                        .param("translatedText", translatedText)
+                        .param("translationSource", translationSource)
+                        .update();
+            }
+        }
     }
 
     public int cleanupInvalidCachedTranslations() {

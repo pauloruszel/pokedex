@@ -14,16 +14,32 @@ public class TranslationJobStatusService {
     private final JdbcClient jdbcClient;
 
     public void start(String jobName, int total) {
-        jdbcClient.sql("""
-                        MERGE INTO translation_job_status (
-                            job_name, status, total, processed, failures, last_error, started_at, updated_at, finished_at
-                        )
-                        KEY(job_name)
-                        VALUES (:jobName, 'RUNNING', :total, 0, 0, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL)
+        int updated = jdbcClient.sql("""
+                        UPDATE translation_job_status
+                           SET status = 'RUNNING',
+                               total = :total,
+                               processed = 0,
+                               failures = 0,
+                               last_error = NULL,
+                               started_at = CURRENT_TIMESTAMP,
+                               updated_at = CURRENT_TIMESTAMP,
+                               finished_at = NULL
+                         WHERE job_name = :jobName
                         """)
                 .param("jobName", jobName)
                 .param("total", total)
                 .update();
+        if (updated == 0) {
+            jdbcClient.sql("""
+                            INSERT INTO translation_job_status (
+                                job_name, status, total, processed, failures, last_error, started_at, updated_at, finished_at
+                            )
+                            VALUES (:jobName, 'RUNNING', :total, 0, 0, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL)
+                            """)
+                    .param("jobName", jobName)
+                    .param("total", total)
+                    .update();
+        }
     }
 
     public void progress(String jobName, int processed, int failures) {

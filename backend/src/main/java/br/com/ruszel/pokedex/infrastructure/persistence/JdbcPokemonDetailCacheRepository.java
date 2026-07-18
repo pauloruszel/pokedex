@@ -65,10 +65,15 @@ public class JdbcPokemonDetailCacheRepository {
 
     @Transactional
     public void saveDetail(PokemonDetail pokemon) {
-        jdbcClient.sql("""
-                        MERGE INTO pokemon (id, name, image_url, sprite_url, height, weight, updated_at)
-                        KEY(id)
-                        VALUES (:id, :name, :imageUrl, :spriteUrl, :height, :weight, CURRENT_TIMESTAMP)
+        int updated = jdbcClient.sql("""
+                        UPDATE pokemon
+                           SET name = :name,
+                               image_url = :imageUrl,
+                               sprite_url = :spriteUrl,
+                               height = :height,
+                               weight = :weight,
+                               updated_at = CURRENT_TIMESTAMP
+                         WHERE id = :id
                         """)
                 .param("id", pokemon.id())
                 .param("name", pokemon.name())
@@ -77,6 +82,19 @@ public class JdbcPokemonDetailCacheRepository {
                 .param("height", pokemon.height())
                 .param("weight", pokemon.weight())
                 .update();
+        if (updated == 0) {
+            jdbcClient.sql("""
+                            INSERT INTO pokemon (id, name, image_url, sprite_url, height, weight, updated_at)
+                            VALUES (:id, :name, :imageUrl, :spriteUrl, :height, :weight, CURRENT_TIMESTAMP)
+                            """)
+                    .param("id", pokemon.id())
+                    .param("name", pokemon.name())
+                    .param("imageUrl", pokemon.imageUrl())
+                    .param("spriteUrl", pokemon.spriteUrl())
+                    .param("height", pokemon.height())
+                    .param("weight", pokemon.weight())
+                    .update();
+        }
 
         saveTypes(pokemon.id(), pokemon.types());
         replaceAbilities(pokemon);
@@ -133,10 +151,26 @@ public class JdbcPokemonDetailCacheRepository {
         }
         int order = 1;
         for (String type : types) {
-            jdbcClient.sql("MERGE INTO pokemon_type (pokemon_id, type_name, slot_order) KEY(pokemon_id, type_name) VALUES (:id, :type, :order)")
+            saveType(pokemonId, type, order++);
+        }
+    }
+
+    private void saveType(Integer pokemonId, String type, int order) {
+        int updated = jdbcClient.sql("""
+                        UPDATE pokemon_type
+                           SET slot_order = :order
+                         WHERE pokemon_id = :id
+                           AND type_name = :type
+                        """)
+                .param("id", pokemonId)
+                .param("type", type)
+                .param("order", order)
+                .update();
+        if (updated == 0) {
+            jdbcClient.sql("INSERT INTO pokemon_type (pokemon_id, type_name, slot_order) VALUES (:id, :type, :order)")
                     .param("id", pokemonId)
                     .param("type", type)
-                    .param("order", order++)
+                    .param("order", order)
                     .update();
         }
     }
@@ -159,10 +193,15 @@ public class JdbcPokemonDetailCacheRepository {
     }
 
     private void replaceSpecies(PokemonDetail pokemon) {
-        jdbcClient.sql("""
-                        MERGE INTO pokemon_species (pokemon_id, genus, flavor_text, text_locale, color, habitat, generation)
-                        KEY(pokemon_id)
-                        VALUES (:id, :genus, :flavorText, :textLocale, :color, :habitat, :generation)
+        int updated = jdbcClient.sql("""
+                        UPDATE pokemon_species
+                           SET genus = :genus,
+                               flavor_text = :flavorText,
+                               text_locale = :textLocale,
+                               color = :color,
+                               habitat = :habitat,
+                               generation = :generation
+                         WHERE pokemon_id = :id
                         """)
                 .param("id", pokemon.id())
                 .param("genus", pokemon.species().genus())
@@ -172,6 +211,20 @@ public class JdbcPokemonDetailCacheRepository {
                 .param("habitat", pokemon.species().habitat())
                 .param("generation", pokemon.species().generation())
                 .update();
+        if (updated == 0) {
+            jdbcClient.sql("""
+                            INSERT INTO pokemon_species (pokemon_id, genus, flavor_text, text_locale, color, habitat, generation)
+                            VALUES (:id, :genus, :flavorText, :textLocale, :color, :habitat, :generation)
+                            """)
+                    .param("id", pokemon.id())
+                    .param("genus", pokemon.species().genus())
+                    .param("flavorText", pokemon.species().flavorText())
+                    .param("textLocale", pokemon.species().flavorText() == null ? null : SPECIES_TEXT_CACHE_LOCALE)
+                    .param("color", pokemon.species().color())
+                    .param("habitat", pokemon.species().habitat())
+                    .param("generation", pokemon.species().generation())
+                    .update();
+        }
     }
 
     private void replaceEvolutionChain(PokemonDetail pokemon) {

@@ -70,15 +70,27 @@ public class JdbcPokemonCatalogCacheRepository {
 
     @Transactional
     public void saveSummary(PokemonSummary pokemon) {
-        jdbcClient.sql("""
-                        MERGE INTO pokemon (id, name, image_url, sprite_url, updated_at)
-                        KEY(id)
-                        VALUES (:id, :name, :imageUrl, NULL, CURRENT_TIMESTAMP)
+        int updated = jdbcClient.sql("""
+                        UPDATE pokemon
+                           SET name = :name,
+                               image_url = :imageUrl,
+                               updated_at = CURRENT_TIMESTAMP
+                         WHERE id = :id
                         """)
                 .param("id", pokemon.id())
                 .param("name", pokemon.name())
                 .param("imageUrl", pokemon.imageUrl())
                 .update();
+        if (updated == 0) {
+            jdbcClient.sql("""
+                            INSERT INTO pokemon (id, name, image_url, sprite_url, updated_at)
+                            VALUES (:id, :name, :imageUrl, NULL, CURRENT_TIMESTAMP)
+                            """)
+                    .param("id", pokemon.id())
+                    .param("name", pokemon.name())
+                    .param("imageUrl", pokemon.imageUrl())
+                    .update();
+        }
         saveTypes(pokemon.id(), pokemon.types());
     }
 
@@ -95,10 +107,26 @@ public class JdbcPokemonCatalogCacheRepository {
         }
         int order = 1;
         for (String type : types) {
-            jdbcClient.sql("MERGE INTO pokemon_type (pokemon_id, type_name, slot_order) KEY(pokemon_id, type_name) VALUES (:id, :type, :order)")
+            saveType(pokemonId, type, order++);
+        }
+    }
+
+    private void saveType(Integer pokemonId, String type, int order) {
+        int updated = jdbcClient.sql("""
+                        UPDATE pokemon_type
+                           SET slot_order = :order
+                         WHERE pokemon_id = :id
+                           AND type_name = :type
+                        """)
+                .param("id", pokemonId)
+                .param("type", type)
+                .param("order", order)
+                .update();
+        if (updated == 0) {
+            jdbcClient.sql("INSERT INTO pokemon_type (pokemon_id, type_name, slot_order) VALUES (:id, :type, :order)")
                     .param("id", pokemonId)
                     .param("type", type)
-                    .param("order", order++)
+                    .param("order", order)
                     .update();
         }
     }
