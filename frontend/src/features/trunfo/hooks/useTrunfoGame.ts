@@ -141,7 +141,7 @@ export function useTrunfoGame() {
       setDisputePile(stake);
     }
 
-    setCurrentTurn(nextTurnForResult(roundResult.result, currentTurn));
+    setCurrentTurn(gameMode === 'local-pvp' ? nextTurnForResult(roundResult.result, currentTurn) : 'player-one');
     setSelectedAttribute(null);
     setRoundResult(null);
 
