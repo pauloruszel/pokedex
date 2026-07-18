@@ -9,7 +9,7 @@ import { trunfoApi } from '../api/trunfoApi';
 import { createTrunfoCardFromApi } from '../api/trunfoMapper';
 import { useTrunfoGame } from '../hooks/useTrunfoGame';
 import type { TrunfoCardModel } from '../types/trunfoCard';
-import type { TrunfoSetup } from '../types/trunfoGame';
+import type { PlayerSide, TrunfoSetup } from '../types/trunfoGame';
 import { buildBalancedCpuDeck, buildDeckPool, TRUNFO_DECK_SIZE } from '../utils/trunfoDeck';
 import { createTrunfoCard } from '../utils/trunfoCardFactory';
 
@@ -26,6 +26,7 @@ export function TrunfoPage({ favorites, types, loadDetail }: Props) {
   const [setup, setSetup] = useState<TrunfoSetup>({
     mode: 'all',
     deckSelection: 'auto',
+    gameMode: 'cpu',
     type: types[0] ?? 'normal',
     difficulty: 'balanced'
   });
@@ -35,12 +36,11 @@ export function TrunfoPage({ favorites, types, loadDetail }: Props) {
   const [draftOffset, setDraftOffset] = useState(0);
   const [hasMoreDraftCards, setHasMoreDraftCards] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [draftPlayer, setDraftPlayer] = useState<PlayerSide>('player-one');
+  const [playerOneCards, setPlayerOneCards] = useState<TrunfoCardModel[]>([]);
   const game = useTrunfoGame();
 
-  const candidates = useMemo(() => {
-    if (setup.mode === 'favorites') return favorites;
-    return [];
-  }, [favorites, setup.mode]);
+  const candidates = useMemo(() => setup.mode === 'favorites' ? favorites : [], [favorites, setup.mode]);
 
   async function startGame() {
     if (setup.deckSelection === 'manual') {
@@ -59,6 +59,7 @@ export function TrunfoPage({ favorites, types, loadDetail }: Props) {
         candidates,
         cards,
         difficulty: setup.difficulty,
+        gameMode: setup.gameMode,
         loadDetail
       });
     } catch {
@@ -71,20 +72,20 @@ export function TrunfoPage({ favorites, types, loadDetail }: Props) {
   async function prepareDraft() {
     setSetupError(null);
     setIsPreparing(true);
+    setDraftPlayer('player-one');
+    setPlayerOneCards([]);
 
     try {
       const cards = setup.mode === 'favorites'
         ? await Promise.all(buildDeckPool(candidates, Math.max(candidates.length, 40)).map(async (pokemon) => createTrunfoCard(pokemon, await loadDetail(pokemon))))
         : await loadDraftCards(0);
 
-      if (cards.length < 8) {
-        throw new Error(messages.trunfo.setupError);
-      }
+      if (cards.length < 8) throw new Error(messages.trunfo.setupError);
 
       setDraftCards(cards);
       setDraftOffset(cards.length);
       setHasMoreDraftCards(setup.mode !== 'favorites' && cards.length === DRAFT_PAGE_SIZE);
-      setSelectedIds(new Set(cards.slice(0, Math.min(TRUNFO_DECK_SIZE, Math.floor(cards.length / 2))).map((card) => card.id)));
+      setSelectedIds(new Set());
     } catch {
       setSetupError(messages.trunfo.setupError);
     } finally {
@@ -99,7 +100,6 @@ export function TrunfoPage({ favorites, types, loadDetail }: Props) {
   async function loadMoreDraftCards() {
     setSetupError(null);
     setIsPreparing(true);
-
     try {
       const nextCards = await loadDraftCards(draftOffset);
       setDraftCards((current) => mergeCards(current, nextCards));
@@ -115,28 +115,42 @@ export function TrunfoPage({ favorites, types, loadDetail }: Props) {
   function toggleDraftCard(card: TrunfoCardModel) {
     setSelectedIds((current) => {
       const next = new Set(current);
-      if (next.has(card.id)) {
-        next.delete(card.id);
-      } else if (next.size < TRUNFO_DECK_SIZE) {
-        next.add(card.id);
-      }
+      if (next.has(card.id)) next.delete(card.id);
+      else if (next.size < TRUNFO_DECK_SIZE) next.add(card.id);
       return next;
     });
   }
 
   async function startSelectedGame() {
-    const playerCards = draftCards.filter((card) => selectedIds.has(card.id));
-    const cpuCards = buildBalancedCpuDeck(draftCards, playerCards);
+    const selectedCards = draftCards.filter((card) => selectedIds.has(card.id));
+    if (selectedCards.length < 4) {
+      setSetupError(messages.trunfo.draftError);
+      return;
+    }
 
-    if (playerCards.length < 4 || cpuCards.length < playerCards.length) {
+    if (setup.gameMode === 'local-pvp' && draftPlayer === 'player-one') {
+      setPlayerOneCards(selectedCards);
+      setSelectedIds(new Set());
+      setDraftPlayer('player-two');
+      setSetupError(null);
+      return;
+    }
+
+    const opponentCards = setup.gameMode === 'local-pvp'
+      ? selectedCards
+      : buildBalancedCpuDeck(draftCards, selectedCards);
+    const firstPlayerCards = setup.gameMode === 'local-pvp' ? playerOneCards : selectedCards;
+
+    if (opponentCards.length < firstPlayerCards.length) {
       setSetupError(messages.trunfo.draftError);
       return;
     }
 
     await game.startGame({
-      playerCards,
-      cpuCards,
+      playerCards: firstPlayerCards,
+      cpuCards: opponentCards,
       difficulty: setup.difficulty,
+      gameMode: setup.gameMode,
       loadDetail
     });
   }
@@ -146,6 +160,8 @@ export function TrunfoPage({ favorites, types, loadDetail }: Props) {
     setDraftOffset(0);
     setHasMoreDraftCards(false);
     setSelectedIds(new Set());
+    setDraftPlayer('player-one');
+    setPlayerOneCards([]);
     setSetupError(null);
   }
 
@@ -153,18 +169,25 @@ export function TrunfoPage({ favorites, types, loadDetail }: Props) {
     <section className="trunfo-page">
       {game.status === 'setup' || game.status === 'loading' ? (
         draftCards.length > 0 ? (
-          <DeckDraft
-            cards={draftCards}
-            selectedIds={selectedIds}
-            deckSize={TRUNFO_DECK_SIZE}
-            isLoading={game.status === 'loading' || isPreparing}
-            canLoadMore={setup.mode !== 'favorites' && hasMoreDraftCards}
-            error={setupError}
-            onToggle={toggleDraftCard}
-            onConfirm={startSelectedGame}
-            onBack={backToSetup}
-            onLoadMore={loadMoreDraftCards}
-          />
+          <>
+            {setup.gameMode === 'local-pvp' && (
+              <div className="trunfo-dispute-banner">
+                {draftPlayer === 'player-one' ? 'Jogador 1: escolha seu baralho.' : 'Jogador 2: escolha seu baralho sem olhar as escolhas do Jogador 1.'}
+              </div>
+            )}
+            <DeckDraft
+              cards={draftCards}
+              selectedIds={selectedIds}
+              deckSize={TRUNFO_DECK_SIZE}
+              isLoading={game.status === 'loading' || isPreparing}
+              canLoadMore={setup.mode !== 'favorites' && hasMoreDraftCards}
+              error={setupError}
+              onToggle={toggleDraftCard}
+              onConfirm={startSelectedGame}
+              onBack={backToSetup}
+              onLoadMore={loadMoreDraftCards}
+            />
+          </>
         ) : (
           <GameSetup
             setup={setup}
@@ -190,6 +213,8 @@ export function TrunfoPage({ favorites, types, loadDetail }: Props) {
             roundResult={game.roundResult}
             winner={game.winner}
             cpuSuggestion={game.cpuSuggestion()}
+            gameMode={game.gameMode}
+            currentTurn={game.currentTurn}
             onPlay={game.playRound}
             onNext={game.nextRound}
             onReset={() => {
