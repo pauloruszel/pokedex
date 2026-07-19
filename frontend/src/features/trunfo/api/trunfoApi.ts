@@ -2,19 +2,13 @@ import { API_BASE_URL } from '../../../shared/api/apiConfig';
 import type { TrunfoDifficulty } from '../types/trunfoGame';
 import type { TrunfoAttributeKey } from '../types/trunfoCard';
 import type { TrunfoApiCard, TrunfoRoomDto } from './trunfoDto';
+import { readApiErrorMessage } from './apiError';
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, init);
 
   if (!response.ok) {
-    let message = `Erro ao consultar API: ${response.status}`;
-    try {
-      const body = await response.json() as { message?: string };
-      message = body.message || message;
-    } catch {
-      // Keep the status fallback when the backend returns no JSON body.
-    }
-    throw new Error(message);
+    throw new Error(await readApiErrorMessage(response, `Erro ao consultar API: ${response.status}`));
   }
 
   return response.json() as Promise<T>;
