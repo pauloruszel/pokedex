@@ -7,7 +7,14 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, init);
 
   if (!response.ok) {
-    throw new Error(`Erro ao consultar API: ${response.status}`);
+    let message = `Erro ao consultar API: ${response.status}`;
+    try {
+      const body = await response.json() as { message?: string };
+      message = body.message || message;
+    } catch {
+      // Keep the status fallback when the backend returns no JSON body.
+    }
+    throw new Error(message);
   }
 
   return response.json() as Promise<T>;

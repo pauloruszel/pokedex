@@ -107,7 +107,7 @@ class TrunfoRoomControllerTest {
     }
 
     @Test
-    void manualRoomStartsAfterBothPlayersConfirmDifferentDecks() {
+    void manualRoomStartsAfterBothPlayersConfirmDecks() {
         Map<?, ?> created = webTestClient.post()
                 .uri("/api/trunfo/rooms")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -145,13 +145,6 @@ class TrunfoRoomControllerTest {
                 .uri("/api/trunfo/rooms/{code}/deck", code)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(Map.of("playerToken", joined.get("playerToken"), "cardIds", List.of(1, 2, 3, 4, 5, 6, 7, 8)))
-                .exchange()
-                .expectStatus().isBadRequest();
-
-        webTestClient.post()
-                .uri("/api/trunfo/rooms/{code}/deck", code)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(Map.of("playerToken", joined.get("playerToken"), "cardIds", List.of(9, 10, 11, 12, 13, 14, 15, 16)))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()

@@ -139,14 +139,6 @@ public class TrunfoRoomService {
                                     .findFirst()
                                     .orElseThrow(() -> new IllegalArgumentException("Carta invalida no baralho.")))
                             .toList();
-                    List<TrunfoCard> opponentDeck = "player-one".equals(side)
-                            ? readCards(room.playerTwoDeck())
-                            : readCards(room.playerOneDeck());
-                    boolean hasOpponentCard = selectedCards.stream()
-                            .anyMatch(selected -> opponentDeck.stream().anyMatch(card -> card.id().equals(selected.id())));
-                    if (hasOpponentCard) {
-                        throw new IllegalArgumentException("Carta ja escolhida pelo adversario.");
-                    }
                     String deckColumn = "player-one".equals(side) ? "player_one_deck" : "player_two_deck";
                     jdbcClient.sql("UPDATE trunfo_room SET " + deckColumn + " = :deck, updated_at = CURRENT_TIMESTAMP WHERE code = :code")
                             .param("deck", writeCards(selectedCards))

@@ -278,8 +278,8 @@ export function TrunfoPage({ favorites, types, loadDetail }: Props) {
     try {
       setOnlineRoom(await trunfoApi.confirmDeck(onlineRoom.code, onlineRoom.playerToken, Array.from(onlineSelectedIds)));
       setOnlineSelectedIds(new Set());
-    } catch {
-      setOnlineError('Nao foi possivel confirmar o baralho.');
+    } catch (error) {
+      setOnlineError(error instanceof Error ? error.message : 'Nao foi possivel confirmar o baralho.');
     } finally {
       setOnlineLoading(false);
     }
