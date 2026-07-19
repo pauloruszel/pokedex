@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 import java.security.SecureRandom;
+import java.sql.Timestamp;
+import java.sql.Types;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -53,10 +55,10 @@ public class TrunfoRoomService {
                 .param("difficulty", blankToDefault(difficulty, "balanced"))
                 .param("deckSelection", sanitizeDeckSelection(deckSelection))
                 .param("deckSize", sanitizedDeckSize)
-                .param("type", hasText(type) ? type : null)
+                .param("type", hasText(type) ? type.trim() : null, Types.VARCHAR)
                 .param("name", blankToDefault(nickname, "Jogador 1"))
                 .param("token", token)
-                .param("expiresAt", Instant.now().plus(30, ChronoUnit.MINUTES))
+                .param("expiresAt", Timestamp.from(Instant.now().plus(30, ChronoUnit.MINUTES)), Types.TIMESTAMP)
                 .update();
         return view(read(code), "player-one", token, false);
     }
@@ -139,6 +141,14 @@ public class TrunfoRoomService {
                                     .findFirst()
                                     .orElseThrow(() -> new IllegalArgumentException("Carta invalida no baralho.")))
                             .toList();
+                    List<TrunfoCard> opponentDeck = "player-one".equals(side)
+                            ? readCards(room.playerTwoDeck())
+                            : readCards(room.playerOneDeck());
+                    boolean hasOpponentCard = selectedCards.stream()
+                            .anyMatch(selected -> opponentDeck.stream().anyMatch(card -> card.id().equals(selected.id())));
+                    if (hasOpponentCard) {
+                        throw new IllegalArgumentException("Carta ja escolhida pelo adversario.");
+                    }
                     String deckColumn = "player-one".equals(side) ? "player_one_deck" : "player_two_deck";
                     jdbcClient.sql("UPDATE trunfo_room SET " + deckColumn + " = :deck, updated_at = CURRENT_TIMESTAMP WHERE code = :code")
                             .param("deck", writeCards(selectedCards))
@@ -240,7 +250,7 @@ public class TrunfoRoomService {
                 .param("history", writeHistory(history))
                 .param("turn", nextTurn)
                 .param("round", room.roundNumber() + 1)
-                .param("winner", winner)
+                .param("winner", winner, Types.VARCHAR)
                 .param("code", room.code())
                 .update();
         return view(read(code), side, token, true);
