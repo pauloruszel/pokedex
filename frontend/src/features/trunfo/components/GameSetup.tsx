@@ -36,26 +36,39 @@ export function GameSetup({ setup, types, favoritesCount, isLoading, error, onCh
   const gameModes: Array<{ value: TrunfoGameMode; label: string; description: string; icon: typeof Bot }> = [
     { value: 'cpu', label: 'Contra a CPU', description: 'Modo clássico contra o computador.', icon: Bot },
     { value: 'local-pvp', label: 'Dois jogadores', description: 'Joguem no mesmo aparelho, alternando a vez.', icon: Users },
-    { value: 'online-pvp', label: 'Sala privada', description: 'Crie ou entre por codigo em outro celular.', icon: Link2 }
+    { value: 'online-pvp', label: 'Sala privada', description: 'Crie ou entre por código em outro celular.', icon: Link2 }
   ];
   const deckSelections: Array<{ value: TrunfoDeckSelection; label: string; description: string; icon: typeof Shuffle }> = [
-    { value: 'auto', label: messages.trunfo.autoDeck, description: isLocalPvp || isOnlinePvp ? 'A API monta e embaralha os dois baralhos automaticamente.' : messages.trunfo.autoDeckDescription, icon: Shuffle },
+    {
+      value: 'auto',
+      label: messages.trunfo.autoDeck,
+      description: isLocalPvp || isOnlinePvp
+        ? 'O sistema monta e embaralha os dois baralhos automaticamente.'
+        : messages.trunfo.autoDeckDescription,
+      icon: Shuffle
+    },
     {
       value: 'manual',
       label: messages.trunfo.manualDeck,
-      description: isLocalPvp
+      description: isLocalPvp || isOnlinePvp
         ? 'Cada jogador escolhe seu próprio baralho antes da partida.'
         : messages.trunfo.manualDeckDescription,
       icon: Hand
     }
   ];
+  const visibleError = isOnlinePvp && error === messages.trunfo.setupError
+    ? 'Não foi possível criar a sala agora. Tente novamente em instantes.'
+    : error;
+  const startLabel = isOnlinePvp
+    ? (isLoading ? 'Criando sala...' : 'Criar sala')
+    : (isLoading ? messages.trunfo.loadingDecks : messages.trunfo.start);
 
   return (
     <section className="trunfo-setup">
       <div className="trunfo-setup-copy">
         <span className="eyebrow-line"><Dices size={16} /> {messages.trunfo.setupEyebrow}</span>
         <h2>{isLocalPvp ? 'Monte dois baralhos e dispute jogador contra jogador.' : isOnlinePvp ? 'Crie uma sala privada e jogue em dois celulares.' : messages.trunfo.setupTitle}</h2>
-        <p>{isLocalPvp ? 'Dois jogadores no mesmo aparelho, com cartas ocultas e turno alternado pelo vencedor da rodada.' : isOnlinePvp ? 'O backend guarda a sala e valida a rodada pelo codigo.' : messages.trunfo.setupDescription}</p>
+        <p>{isLocalPvp ? 'Dois jogadores no mesmo aparelho, com cartas ocultas e turno alternado pelo vencedor da rodada.' : isOnlinePvp ? 'O servidor guarda a sala e valida cada rodada pelo código.' : messages.trunfo.setupDescription}</p>
       </div>
 
       <div className="trunfo-setup-panel">
@@ -138,11 +151,11 @@ export function GameSetup({ setup, types, favoritesCount, isLoading, error, onCh
           </div>
         </div>
 
-        {error && <div className="error-box">{error}</div>}
+        {visibleError && <div className="error-box">{visibleError}</div>}
 
         <button className="primary-control trunfo-start-button" disabled={isLoading} onClick={onStart}>
           {isLoading ? <span className="pokeball-loader pokeball-loader--small" /> : <Play size={18} />}
-          {isLoading ? messages.trunfo.loadingDecks : messages.trunfo.start}
+          {startLabel}
         </button>
       </div>
     </section>
