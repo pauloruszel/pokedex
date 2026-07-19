@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 import java.security.SecureRandom;
+import java.sql.Types;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ public class TrunfoRoomService {
                 .param("difficulty", blankToDefault(difficulty, "balanced"))
                 .param("deckSelection", sanitizeDeckSelection(deckSelection))
                 .param("deckSize", sanitizedDeckSize)
-                .param("type", hasText(type) ? type : null)
+                .param("type", hasText(type) ? type.trim() : null, Types.VARCHAR)
                 .param("name", blankToDefault(nickname, "Jogador 1"))
                 .param("token", token)
                 .param("expiresAt", Instant.now().plus(30, ChronoUnit.MINUTES))
@@ -248,7 +249,7 @@ public class TrunfoRoomService {
                 .param("history", writeHistory(history))
                 .param("turn", nextTurn)
                 .param("round", room.roundNumber() + 1)
-                .param("winner", winner)
+                .param("winner", winner, Types.VARCHAR)
                 .param("code", room.code())
                 .update();
         return view(read(code), side, token, true);
