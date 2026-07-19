@@ -12,7 +12,6 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 import javax.sql.DataSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 @Testcontainers(disabledWithoutDocker = true)
 class TrunfoRoomServicePostgresTest {
@@ -35,7 +34,7 @@ class TrunfoRoomServicePostgresTest {
         );
         jdbcClient = JdbcClient.create(dataSource);
         recreateSchema();
-        service = new TrunfoRoomService(jdbcClient, mock(ListTrunfoCardsUseCase.class));
+        service = new TrunfoRoomService(jdbcClient, new ListTrunfoCardsUseCase(null, null, null));
     }
 
     @Test
