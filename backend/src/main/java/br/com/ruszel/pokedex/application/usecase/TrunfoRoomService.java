@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 import java.security.SecureRandom;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -57,7 +58,7 @@ public class TrunfoRoomService {
                 .param("type", hasText(type) ? type.trim() : null, Types.VARCHAR)
                 .param("name", blankToDefault(nickname, "Jogador 1"))
                 .param("token", token)
-                .param("expiresAt", Instant.now().plus(30, ChronoUnit.MINUTES))
+                .param("expiresAt", Timestamp.from(Instant.now().plus(30, ChronoUnit.MINUTES)), Types.TIMESTAMP)
                 .update();
         return view(read(code), "player-one", token, false);
     }
