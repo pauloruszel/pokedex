@@ -99,10 +99,14 @@ public class PokedexBootstrapRunner implements CommandLineRunner {
             String internalOfficialArtworkUrl = cachePokemonImageUseCase.execute(id, "official-artwork", officialArtworkUrl);
             String internalFrontSpriteUrl = cachePokemonImageUseCase.execute(id, "front-default", frontSpriteUrl);
 
-            jdbcClient.sql("""
-                            MERGE INTO pokemon (id, name, image_url, sprite_url, source_url, updated_at)
-                            KEY(id)
-                            VALUES (:id, :name, :imageUrl, :spriteUrl, :sourceUrl, CURRENT_TIMESTAMP)
+            int updated = jdbcClient.sql("""
+                            UPDATE pokemon
+                               SET name = :name,
+                                   image_url = :imageUrl,
+                                   sprite_url = :spriteUrl,
+                                   source_url = :sourceUrl,
+                                   updated_at = CURRENT_TIMESTAMP
+                             WHERE id = :id
                             """)
                     .param("id", id)
                     .param("name", name)
@@ -110,6 +114,18 @@ public class PokedexBootstrapRunner implements CommandLineRunner {
                     .param("spriteUrl", internalFrontSpriteUrl)
                     .param("sourceUrl", sourceUrl)
                     .update();
+            if (updated == 0) {
+                jdbcClient.sql("""
+                                INSERT INTO pokemon (id, name, image_url, sprite_url, source_url, updated_at)
+                                VALUES (:id, :name, :imageUrl, :spriteUrl, :sourceUrl, CURRENT_TIMESTAMP)
+                                """)
+                        .param("id", id)
+                        .param("name", name)
+                        .param("imageUrl", internalOfficialArtworkUrl)
+                        .param("spriteUrl", internalFrontSpriteUrl)
+                        .param("sourceUrl", sourceUrl)
+                        .update();
+            }
             inserted++;
             if (inserted % 100 == 0) {
                 log.info("Pokemon catalog bootstrap progress: {} records.", inserted);
