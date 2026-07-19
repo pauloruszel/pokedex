@@ -20,7 +20,25 @@ public class JdbcPokemonDetailCacheRepository {
     private final JdbcClient jdbcClient;
 
     public Optional<PokemonDetail> findDetail(String nameOrId) {
-        String sql = nameOrId.matches("\\d+")
+        if (nameOrId == null || nameOrId.isBlank()) {
+            return Optional.empty();
+        }
+
+        String normalized = nameOrId.trim();
+        boolean searchById = normalized.matches("\\d+");
+        Object lookupValue;
+
+        if (searchById) {
+            try {
+                lookupValue = Integer.valueOf(normalized);
+            } catch (NumberFormatException exception) {
+                return Optional.empty();
+            }
+        } else {
+            lookupValue = normalized;
+        }
+
+        String sql = searchById
                 ? """
                 SELECT id, name, image_url, sprite_url, height, weight
                   FROM pokemon
@@ -45,7 +63,7 @@ public class JdbcPokemonDetailCacheRepository {
                 """;
 
         return jdbcClient.sql(sql)
-                .param("value", nameOrId)
+                .param("value", lookupValue)
                 .param("locale", SPECIES_TEXT_CACHE_LOCALE)
                 .query((rs, rowNum) -> new PokemonDetail(
                         rs.getInt("id"),
