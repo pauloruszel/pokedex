@@ -260,11 +260,27 @@ public class TrunfoRoomService {
         List<TrunfoCard> other = "player-one".equals(side) ? readCards(room.playerTwoDeck()) : readCards(room.playerOneDeck());
         List<TrunfoRoundView> history = readHistory(room.history());
         return new TrunfoRoomView(
-                room.code(), room.state(), room.mode(), room.difficulty(), room.typeName(), room.deckSelection(),
-                sanitizeDeckSize(room.deckSize()), side, token, room.playerOneName(), room.playerTwoName(),
-                room.currentTurn(), room.roundNumber(), own.size(), other.size(), readCards(room.disputePile()).size(),
-                own.isEmpty() ? null : own.get(0), revealOpponent && !other.isEmpty() ? other.get(0) : null,
-                history.isEmpty() ? null : history.get(0), room.winner(), history.stream().limit(12).toList()
+                room.code(),
+                room.state(),
+                room.mode(),
+                room.difficulty(),
+                room.typeName(),
+                room.deckSelection(),
+                sanitizeDeckSize(room.deckSize()),
+                side,
+                token,
+                room.playerOneName(),
+                room.playerTwoName(),
+                room.currentTurn(),
+                room.roundNumber(),
+                own.size(),
+                other.size(),
+                readCards(room.disputePile()).size(),
+                own.isEmpty() ? null : own.get(0),
+                revealOpponent && !other.isEmpty() ? other.get(0) : null,
+                history.isEmpty() ? null : history.get(0),
+                room.winner(),
+                history.stream().limit(12).toList()
         );
     }
 
@@ -272,12 +288,24 @@ public class TrunfoRoomService {
         return jdbcClient.sql("SELECT * FROM trunfo_room WHERE code = :code")
                 .param("code", normalizeCode(code))
                 .query((rs, rowNum) -> new Room(
-                        rs.getString("code"), rs.getString("state"), rs.getString("mode"), rs.getString("difficulty"),
-                        rs.getString("deck_selection"), rs.getInt("deck_size"), rs.getString("type_name"),
-                        rs.getString("player_one_name"), rs.getString("player_two_name"), rs.getString("player_one_token"),
-                        rs.getString("player_two_token"), rs.getString("player_one_deck"), rs.getString("player_two_deck"),
-                        rs.getString("dispute_pile"), rs.getString("history"), rs.getString("current_turn"),
-                        rs.getInt("round_number"), rs.getString("winner")
+                        rs.getString("code"),
+                        rs.getString("state"),
+                        rs.getString("mode"),
+                        rs.getString("difficulty"),
+                        rs.getString("deck_selection"),
+                        rs.getInt("deck_size"),
+                        rs.getString("type_name"),
+                        rs.getString("player_one_name"),
+                        rs.getString("player_two_name"),
+                        rs.getString("player_one_token"),
+                        rs.getString("player_two_token"),
+                        rs.getString("player_one_deck"),
+                        rs.getString("player_two_deck"),
+                        rs.getString("dispute_pile"),
+                        rs.getString("history"),
+                        rs.getString("current_turn"),
+                        rs.getInt("round_number"),
+                        rs.getString("winner")
                 ))
                 .optional()
                 .orElseThrow(() -> new IllegalArgumentException("Sala nao encontrada."));
@@ -291,30 +319,66 @@ public class TrunfoRoomService {
 
     private boolean exists(String code) {
         return jdbcClient.sql("SELECT COUNT(*) FROM trunfo_room WHERE code = :code")
-                .param("code", code).query(Integer.class).single() > 0;
+                .param("code", code)
+                .query(Integer.class)
+                .single() > 0;
     }
 
-    private String randomCode() { return "PKM-" + (1000 + RANDOM.nextInt(9000)); }
-    private int sanitizeDeckSize(Integer deckSize) { return deckSize != null && deckSize >= NORMAL_DECK_SIZE ? NORMAL_DECK_SIZE : FAST_DECK_SIZE; }
-    private String sanitizeDeckSelection(String deckSelection) { return "manual".equalsIgnoreCase(deckSelection) ? "manual" : "auto"; }
-    private String normalizeCode(String code) { return code == null ? "" : code.trim().toUpperCase(Locale.ROOT); }
-    private String blankToDefault(String value, String fallback) { return hasText(value) ? value.trim() : fallback; }
-    private boolean hasText(String value) { return value != null && !value.isBlank(); }
-    private List<TrunfoCard> readCards(String json) { return readList(json, CARD_LIST); }
-    private List<TrunfoRoundView> readHistory(String json) { return readList(json, ROUND_LIST); }
+    private String randomCode() {
+        return "PKM-" + (1000 + RANDOM.nextInt(9000));
+    }
+
+    private int sanitizeDeckSize(Integer deckSize) {
+        return deckSize != null && deckSize >= NORMAL_DECK_SIZE ? NORMAL_DECK_SIZE : FAST_DECK_SIZE;
+    }
+
+    private String sanitizeDeckSelection(String deckSelection) {
+        return "manual".equalsIgnoreCase(deckSelection) ? "manual" : "auto";
+    }
+
+    private String normalizeCode(String code) {
+        return code == null ? "" : code.trim().toUpperCase(Locale.ROOT);
+    }
+
+    private String blankToDefault(String value, String fallback) {
+        return hasText(value) ? value.trim() : fallback;
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.isBlank();
+    }
+
+    private List<TrunfoCard> readCards(String json) {
+        return readList(json, CARD_LIST);
+    }
+
+    private List<TrunfoRoundView> readHistory(String json) {
+        return readList(json, ROUND_LIST);
+    }
 
     private <T> List<T> readList(String json, TypeReference<List<T>> type) {
         if (!hasText(json)) return new ArrayList<>();
-        try { return OBJECT_MAPPER.readValue(json, type); }
-        catch (Exception exception) { throw new IllegalStateException("Estado da sala invalido.", exception); }
+        try {
+            return OBJECT_MAPPER.readValue(json, type);
+        } catch (Exception exception) {
+            throw new IllegalStateException("Estado da sala invalido.", exception);
+        }
     }
 
-    private String writeCards(List<TrunfoCard> cards) { return write(cards); }
-    private String writeHistory(List<TrunfoRoundView> history) { return write(history); }
+    private String writeCards(List<TrunfoCard> cards) {
+        return write(cards);
+    }
+
+    private String writeHistory(List<TrunfoRoundView> history) {
+        return write(history);
+    }
 
     private String write(Object value) {
-        try { return OBJECT_MAPPER.writeValueAsString(value); }
-        catch (Exception exception) { throw new IllegalStateException("Estado da sala invalido.", exception); }
+        try {
+            return OBJECT_MAPPER.writeValueAsString(value);
+        } catch (Exception exception) {
+            throw new IllegalStateException("Estado da sala invalido.", exception);
+        }
     }
 
     private boolean isValidAttribute(String attribute) {
@@ -337,9 +401,24 @@ public class TrunfoRoomService {
     }
 
     private record Room(
-            String code, String state, String mode, String difficulty, String deckSelection, Integer deckSize,
-            String typeName, String playerOneName, String playerTwoName, String playerOneToken, String playerTwoToken,
-            String playerOneDeck, String playerTwoDeck, String disputePile, String history, String currentTurn,
-            Integer roundNumber, String winner
-    ) {}
+            String code,
+            String state,
+            String mode,
+            String difficulty,
+            String deckSelection,
+            Integer deckSize,
+            String typeName,
+            String playerOneName,
+            String playerTwoName,
+            String playerOneToken,
+            String playerTwoToken,
+            String playerOneDeck,
+            String playerTwoDeck,
+            String disputePile,
+            String history,
+            String currentTurn,
+            Integer roundNumber,
+            String winner
+    ) {
+    }
 }
