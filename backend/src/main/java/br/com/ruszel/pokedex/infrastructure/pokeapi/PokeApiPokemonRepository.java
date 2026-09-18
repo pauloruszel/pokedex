@@ -27,6 +27,7 @@ public class PokeApiPokemonRepository implements PokemonRepository {
     @Override
     public Mono<PokemonPage> findAll(int limit, int offset) {
         return Mono.fromSupplier(() -> catalogCacheRepository.findPage(limit, offset))
+                .subscribeOn(Schedulers.boundedElastic())
                 .filter(this::hasTypedResults)
                 .switchIfEmpty(fetchRemotePage(limit, offset));
     }
@@ -34,6 +35,7 @@ public class PokeApiPokemonRepository implements PokemonRepository {
     @Override
     public Mono<PokemonDetail> findByNameOrId(String nameOrId) {
         return Mono.fromSupplier(() -> detailCacheRepository.findDetail(nameOrId))
+                .subscribeOn(Schedulers.boundedElastic())
                 .flatMap(optional -> optional.map(Mono::just).orElseGet(Mono::empty))
                 .switchIfEmpty(fetchPokemon(nameOrId)
                         .flatMap(pokemon -> fetchSpecies(speciesUrl(pokemon))
@@ -48,12 +50,14 @@ public class PokeApiPokemonRepository implements PokemonRepository {
     @Override
     public Flux<String> findTypes() {
         return Mono.fromSupplier(catalogCacheRepository::findTypes)
+                .subscribeOn(Schedulers.boundedElastic())
                 .flatMapMany(Flux::fromIterable);
     }
 
     @Override
     public Mono<PokemonPage> findByType(String typeName, int limit, int offset) {
         return Mono.fromSupplier(() -> catalogCacheRepository.findPageByType(typeName, limit, offset))
+                .subscribeOn(Schedulers.boundedElastic())
                 .filter(this::hasTypedResults)
                 .switchIfEmpty(fetchRemotePageByType(typeName, limit, offset));
     }
