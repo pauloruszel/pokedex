@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -34,16 +37,17 @@ public class PokemonImageController {
     )
     @ApiResponse(responseCode = "200", description = "Imagem retornada", content = @Content(mediaType = "image/png"))
     @ApiResponse(responseCode = "404", description = "Imagem não encontrada", content = @Content)
-    public ResponseEntity<FileSystemResource> image(
+    public Mono<ResponseEntity<FileSystemResource>> image(
             @Parameter(description = "ID numérico do Pokémon.", example = "25")
             @PathVariable Integer pokemonId,
             @Parameter(description = "Tipo da imagem solicitada.", example = "official-artwork")
             @PathVariable String imageType
     ) {
-        return getPokemonImageUseCase.execute(pokemonId, imageType)
+        return Mono.fromCallable(() -> getPokemonImageUseCase.execute(pokemonId, imageType)
                 .filter(image -> image.localPath() != null && Files.exists(Path.of(image.localPath())))
                 .map(this::toResponse)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElseGet(() -> ResponseEntity.notFound().build()))
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     private ResponseEntity<FileSystemResource> toResponse(PokemonImage image) {
